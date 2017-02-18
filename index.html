@@ -41,16 +41,33 @@
         </div>
     </div>
 
+    <div class = 'row justify-content-center pt-2'>
+        <div class = 'col-6 col-sm-8'>
+            <button class = 'btn btn-success' onclick = 'dbpediaModule.request()'>Annotate</button>
+        </div>
+    </div>
+
+    <div class = 'row justify-content-center pt-5'>
+        <div class = 'col-6 col-sm-8'>
+            <ul id = 'annotations' class = 'list-group' ></ul>
+        </div>
+    </div>
+
 </div>
 
-<script src="js/jquery-3.1.1.slim.min.js"></script>
+<script src="js/jquery-3.1.1.min.js"></script>
 <!-- <script src="js/bootstrap.min.js"></script> -->
 
 <script src="modules/speech.js"></script>
+<script src="modules/dbpedia.js"></script>
+
 <script>
 
 var speechModule = new Module.Speech( 'speechTextarea', 'speechButton', true );
 speechModule.bindCheckbox( 'speechContinuous' );
+
+var dbpediaModule = new Module.DBpedia( 'speechTextarea', 'annotations', true );
+//dbpediaModule.request();
 
 </script>
 

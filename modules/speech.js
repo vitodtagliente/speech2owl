@@ -4,7 +4,7 @@ var Module = Module || {};
 Module.Speech = function( id_textarea, id_button, debug ){
 
     if ( 'webkitSpeechRecognition' in window ) {
-        console.log("webkitSpeechRecognition is  available");
+        console.log("webkitSpeechRecognition is available");
     }
     else return;
 
