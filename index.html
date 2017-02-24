@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="icon" href="img/brand.png">
 
-<title>SpeechIDE</title>
+<title>SpeechOWL</title>
 
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/app.css">
@@ -27,12 +27,7 @@
             <form>
                 <div class="form-group">
                     <label for="speechTextarea">Recognition</label>
-                    <textarea class="form-control" id="speechTextarea"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-check-label">
-                        <input id = 'speechContinuous' class="form-check-input" type="checkbox"> Continuous
-                    </label>
+                    <textarea class="form-control" id="speechTextarea" rows='3'>John is a cute boy which likes to eat pizza. Sarah likes pizza too</textarea>
                 </div>
                 <div class="form-group">
                     <button id = 'speechButton' type="button" class="btn btn-info">Speech</button>
@@ -43,33 +38,134 @@
 
     <div class = 'row justify-content-center pt-2'>
         <div class = 'col-6 col-sm-8'>
-            <button class = 'btn btn-success' onclick = 'dbpediaModule.request()'>Annotate</button>
+            <form class = 'form-inline pt-2' style='border-top: 1px solid gray'>
+                <div class="form-group pr-2">
+                    <label class="form-check-label">
+                        <input id = 'speechContinuous' class="form-check-input" type="checkbox"> Continuous speech
+                    </label>
+                </div>
+                <div class="form-group pr-2">
+                    <label class="form-check-label">
+                        <input id = 'ignoreVerbs' class="form-check-input" type="checkbox" checked> Ignore Verbs
+                    </label>
+                </div>
+                <div class="form-group pr-2">
+                    <label class="form-check-label">
+                        <input id = 'ignoreAdjectives' class="form-check-input" type="checkbox" checked> Ignore Adjectives
+                    </label>
+                </div>
+                <div class="form-group pr-2">
+                    <label class="form-check-label">
+                        <input id = 'ignorePeople' class="form-check-input" type="checkbox" checked> Ignore People
+                    </label>
+                </div>
+                <div class="form-group pr-2">
+                    <label class="form-check-label">
+                        <input id = 'ignorePlaces' class="form-check-input" type="checkbox" checked> Ignore Places
+                    </label>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div class = 'row justify-content-center pt-5'>
+    <div class = 'row justify-content-center pt-3'>
         <div class = 'col-6 col-sm-8'>
-            <ul id = 'annotations' class = 'list-group' ></ul>
+            <button id = 'btn_annotate' class = 'btn btn-success'>Annotate</button>
+        </div>
+    </div>
+
+    <div class = 'row justify-content-center pt-3 pb-3'>
+        <div class = 'col-6 col-sm-8'>
+            <div id = 'code' class = 'invisible'></div>
         </div>
     </div>
 
 </div>
 
-<script src="js/jquery-3.1.1.min.js"></script>
-<!-- <script src="js/bootstrap.min.js"></script> -->
+<script src='js/parser.js'></script>
+<script src='js/compromise.min.js'></script>
+<script src='js/jaro_winkler.js'></script>
+<script src='ace.min/ace.js'></script>
 
 <script src="modules/speech.js"></script>
-<script src="modules/dbpedia.js"></script>
+<script src='modules/nlp.js'></script>
+<script src='modules/rdf.js'></script>
+<script src='modules/entitylinker.js'></script>
 
 <script>
 
-var speechModule = new Module.Speech( 'speechTextarea', 'speechButton', true );
-speechModule.bindCheckbox( 'speechContinuous' );
+var textarea = document.getElementById('speechTextarea');
 
-var dbpediaModule = new Module.DBpedia( 'speechTextarea', 'annotations', true );
-//dbpediaModule.request();
+// Init the speech module
+var speech = new Module.Speech( 'speechTextarea', 'speechButton', true );
+speech.bindCheckbox( 'speechContinuous' );
+
+// init the ace framwork
+var editor = ace.edit("code");
+editor.setTheme("ace/theme/kuroir");
+editor.getSession().setMode("ace/mode/json");
+editor.setReadOnly(true);
+
+// Init the ontology
+var rdf = new Module.RDF( 'assets/pizza.owl.xml', true );
+var RDFS = new Module.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
+
+var btn_annotate = document.getElementById( 'btn_annotate' );
+if( btn_annotate != null )
+    btn_annotate.onclick = annotate;
+
+function annotate(){
+
+    console.log( '------------- NLP -------------' );
+
+    var inspector = new Module.NLP.Inspector( textarea.value );
+    console.log( inspector.sentences );
+    console.log( inspector.data() );
+
+    console.log( '-------------------------------' );
+
+    var linker = new Module.EntityLinker( inspector, rdf, true );
+    linker.ignoreVerbs = document.getElementById('ignoreVerbs').checked || false;
+    linker.ignoreAdjectives = document.getElementById('ignoreAdjectives').checked || false;
+    linker.ignorePeople = document.getElementById('ignorePeople').checked || false;
+    linker.ignorePlaces = document.getElementById('ignorePlaces').checked || false;
+
+    var links = linker.link( null, RDFS.get('label'), null );
+
+    var code = document.getElementById('code');
+    code.className = code.className.replace('invisible', 'code');
+    editor.resize();
+
+    if( links.length == 0 ){
+
+    }
+    else {
+
+    }
+
+}
 
 </script>
+
+
+<!--
+<script>
+/* RDFLIB.JS
+var $rdf = require('rdflib');
+var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#")
+
+var store = $rdf.graph();
+var contentType = 'application/rdf+xml';
+
+try{
+    $rdf.parse( file_content, store, 'https://example.org/resource.ttl', contentType);
+
+} catch(err){
+    console.log(err);
+}
+*/
+</script>
+-->
 
 </body>
 </html>

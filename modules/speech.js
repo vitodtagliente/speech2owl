@@ -14,13 +14,19 @@ Module.Speech = function( id_textarea, id_button, debug ){
     this.button = document.getElementById( id_button );
 
     this.recognition = new webkitSpeechRecognition();
-    this.recognition.lang = 'it';
+    this.recognition.lang = 'eng';
     this.recognition.continuous = false;
 
     // sta ascoltando???
     this.recognizing = false;
 
     Module.Speech.singleton = this;
+
+    this.lang = function(arg) {
+        if( arg != null )
+            this.recognition.lang = arg;
+        else return this.recognition.lang;
+    }
 
     // bind events
     this.recognition.onresult = function (event) {
@@ -49,7 +55,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
         instance.updateButton( 'Recognizing...', 'btn-warning' );
 
         if( instance.debug )
-            console.log( "Recognizing..." );
+            console.log( "Speech::Recognizing..." );
     }
 
     this.recognition.onend = function(){
@@ -59,7 +65,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
         instance.updateButton( 'Speech', 'btn-info' );
 
         if( instance.debug )
-            console.log( "Recognition stop" );
+            console.log( "Speech::Recognition stop" );
     }
 
     if( this.button != null ){
@@ -83,7 +89,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
             Module.Speech.singleton.recognition.continuous = elem.checked;
 
             if( Module.Speech.singleton.debug )
-                console.log( "SpeechContinuous::" + elem.checked );
+                console.log( "Speech::Continuous = " + elem.checked );
         }
     }
 
