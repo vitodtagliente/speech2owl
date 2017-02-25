@@ -86,6 +86,7 @@
 <script src='js/compromise.min.js'></script>
 <script src='js/jaro_winkler.js'></script>
 <script src='ace.min/ace.js'></script>
+<script src='js/n3-browser.min.js'></script>
 
 <script src="modules/speech.js"></script>
 <script src='modules/nlp.js'></script>
@@ -105,6 +106,9 @@ var editor = ace.edit("code");
 editor.setTheme("ace/theme/kuroir");
 editor.getSession().setMode("ace/mode/json");
 editor.setReadOnly(true);
+editor.getSession().setTabSize(4);
+editor.setFontSize(14);
+editor.$blockScrolling = Infinity;
 
 // Init the ontology
 var rdf = new Module.RDF( 'assets/pizza.owl.xml', true );
@@ -135,11 +139,39 @@ function annotate(){
     var code = document.getElementById('code');
     code.className = code.className.replace('invisible', 'code');
     editor.resize();
+    editor.setValue("\n");
 
     if( links.length == 0 ){
-
+        editor.setValue( 'Mathing failed!' );
     }
     else {
+
+        var log = [];
+        for( var i = 0; i < links.length; i++ ){
+            var l = links[i];
+
+            var temp = "\n" + JSON.stringify( l.triple ) + "\n";
+            temp = temp.replace( '{', "{\n  " );
+            temp = temp.replace( '}', "\n}" );
+            temp = temp.replace( ',', ",\n  " );
+            temp = temp.replace( ',"', ",\n  " + '"' );
+
+            log.push( temp );
+        }
+
+        editor.setValue( '[' + log.join(',') + ']' );
+
+        /*
+        var writer = N3.Writer();
+        for( var i = 0; i < links.length; i++ ){
+            var l = links[i];
+
+            writer.addTriple( l.triple );
+        }
+        writer.end(function (error, result) {
+            editor.setValue( result );
+        });
+        */
 
     }
 

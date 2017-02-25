@@ -10,7 +10,7 @@
 
     // to link entities
     var links = linker.link( subject, predicate, object )
-    
+
 */
 
 var Module = Module || {};
@@ -53,9 +53,9 @@ Module.EntityLinker = function( inspector, ontology, debug ){
                     links.push({
                         token: t.token,
                         triple: {
-                            object: best.object,
                             subject: best.subject,
-                            predicate: best.predicate
+                            predicate: best.predicate,
+                            object: best.object,
                         }
                     });
                 }
