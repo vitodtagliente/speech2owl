@@ -37,7 +37,7 @@ OWL.Ontology.Namespace = function(){
 
             if( n.isBase ) {
                 header.push( '\txmlns = "' + n.URI + '"' );
-                header.push( '\txml:base = "' + n.URI + '"' );
+                header.push( '\txml:base = "' + n.URI.replace('#', '') + '"' );
             }
         }
 
