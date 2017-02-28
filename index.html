@@ -64,6 +64,11 @@
                         <input id = 'ignorePlaces' class="form-check-input" type="checkbox" checked> Ignore Places
                     </label>
                 </div>
+                <div class="form-group pr-2">
+                    <label class="form-check-label">
+                        <input id = 'ignoreOther' class="form-check-input" type="checkbox" checked> Ignore Other
+                    </label>
+                </div>
             </form>
         </div>
     </div>
@@ -76,16 +81,19 @@
 
     <div class = 'row justify-content-center pt-3 pb-3'>
         <div class = 'col-6 col-sm-8'>
-            <div id = 'code' class = 'invisible'></div>
+            <div id = 'annotation' class = 'invisible'></div>
         </div>
     </div>
 
 </div>
 
+<script src='js/jquery-3.1.1.slim.min.js'></script>
+<script src='js/tether.min.js'></script>
+<script src='js/bootstrap.min.js'></script>
+
 <script src='js/parser.js'></script>
 <script src='js/compromise.min.js'></script>
 <script src='js/jaro_winkler.js'></script>
-<script src='ace.min/ace.js'></script>
 <script src='js/n3-browser.min.js'></script>
 
 <script src="modules/speech.js"></script>
@@ -100,15 +108,6 @@ var textarea = document.getElementById('speechTextarea');
 // Init the speech module
 var speech = new Module.Speech( 'speechTextarea', 'speechButton', true );
 speech.bindCheckbox( 'speechContinuous' );
-
-// init the ace framwork
-var editor = ace.edit("code");
-editor.setTheme("ace/theme/kuroir");
-editor.getSession().setMode("ace/mode/json");
-editor.setReadOnly(true);
-editor.getSession().setTabSize(4);
-editor.setFontSize(14);
-editor.$blockScrolling = Infinity;
 
 // Init the ontology
 var rdf = new Module.RDF( 'assets/pizza.owl.xml', true );
@@ -133,48 +132,48 @@ function annotate(){
     linker.ignoreAdjectives = document.getElementById('ignoreAdjectives').checked || false;
     linker.ignorePeople = document.getElementById('ignorePeople').checked || false;
     linker.ignorePlaces = document.getElementById('ignorePlaces').checked || false;
+    linker.ignoreOther = document.getElementById('ignoreOther').checked || false;
 
     var links = linker.link( null, RDFS.get('label'), null );
 
-    var code = document.getElementById('code');
-    code.className = code.className.replace('invisible', 'code');
-    editor.resize();
-    editor.setValue("\n");
+    // Show all the entities
 
-    if( links.length == 0 ){
-        editor.setValue( 'Mathing failed!' );
-    }
-    else {
+    var annotation = document.getElementById('annotation');
+    annotation.className = annotation.className.replace('invisible', '');
 
-        var log = [];
-        for( var i = 0; i < links.length; i++ ){
-            var l = links[i];
+    var html = [];
 
-            var temp = "\n" + JSON.stringify( l.triple ) + "\n";
-            temp = temp.replace( '{', "{\n  " );
-            temp = temp.replace( '}', "\n}" );
-            temp = temp.replace( ',', ",\n  " );
-            temp = temp.replace( ',"', ",\n  " + '"' );
+    var text = textarea.value.toLowerCase();
 
-            log.push( temp );
-        }
+    html.push( '<p class="alert alert-success">' );
 
-        editor.setValue( '[' + log.join(',') + ']' );
+    for( var i = 0; i < links.length; i++ ){
+        var l = links[i];
 
-        /*
-        var writer = N3.Writer();
-        for( var i = 0; i < links.length; i++ ){
-            var l = links[i];
-
-            writer.addTriple( l.triple );
-        }
-        writer.end(function (error, result) {
-            editor.setValue( result );
-        });
-        */
-
+        text = text.replaceAll(
+            l.token,
+            '<u data-toggle="tooltip" data-placement="top" title="' + l.triple.subject + '">' + l.token + '</u>'
+        );
+        console.log(l.token.capitalizeFirstLetter());
     }
 
+    html.push( text );
+    html.push( '</p>' );
+
+    annotation.innerHTML = html.join( '' );
+
+    $('[data-toggle="tooltip"]').tooltip();
+
+}
+
+String.prototype.escapeRegExp = function(){
+    return this.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+String.prototype.replaceAll = function( find, replace ){
+    return this.replace(new RegExp(find.escapeRegExp(), 'g'), replace);
+}
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
 </script>

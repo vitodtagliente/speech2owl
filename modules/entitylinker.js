@@ -24,6 +24,7 @@ Module.EntityLinker = function( inspector, ontology, debug ){
     this.ignoreAdjectives = false;
     this.ignorePeople = false;
     this.ignorePlaces = false;
+    this.ignoreOther = false;
 
     this.link = function( subject, predicate, object ){
         var checked = [];
@@ -43,7 +44,8 @@ Module.EntityLinker = function( inspector, ontology, debug ){
                     t.isVerb && this.ignoreVerbs ||
                     t.isAdjective && this.ignoreAdjectives ||
                     t.isPeople && this.ignorePeople ||
-                    t.isPlace && this.ignorePlaces
+                    t.isPlace && this.ignorePlaces ||
+                    t.isOther && this.ignoreOther
                 )
                     continue;
                 checked.push( t.token );

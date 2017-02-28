@@ -39,7 +39,7 @@ Module.NLP.SentenceInspector = function( text ){
     this.adjectives = this.r.adjectives().out('array');
     this.adverbs = this.r.adverbs().out('array');
 
-    this.findConjunctions = function(){
+    this.findOther = function(){
         var result = [];
         for( var i = 0; i < this.tokens.length; i++ ){
             var t = this.tokens[i];
@@ -53,7 +53,7 @@ Module.NLP.SentenceInspector = function( text ){
         }
         return result;
     }
-    this.conjunctions = this.findConjunctions();
+    this.other = this.findOther();
 
     this.topics = this.r.topics().out('array');
     this.people = this.r.people().out('array');
@@ -62,10 +62,12 @@ Module.NLP.SentenceInspector = function( text ){
     this.preprocess = function(){
         this.processed.text = this.sourceText;
 
-        for( var i = 0; i < this.conjunctions.length; i++ ){
-            var c  = this.conjunctions[i];
+        /*
+        for( var i = 0; i < this.other.length; i++ ){
+            var c  = this.other[i];
             this.processed.text = this.processed.text.replace(c, '');
         }
+        */
 
         for( var i = 0; i < this.adverbs.length; i++ ){
             var c  = this.adverbs[i];
@@ -92,7 +94,8 @@ Module.NLP.SentenceInspector = function( text ){
                 isNoun: this.nouns.contains( t ),
                 isPeople: this.people.contains( t ),
                 isPlace: this.places.contains( t ),
-                isTopic: this.topics.contains( t )
+                isTopic: this.topics.contains( t ),
+                isOther: this.other.contains( t )
             };
 
             this.processed.terms.push( term );
