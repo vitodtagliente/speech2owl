@@ -23,11 +23,11 @@
 <div class = 'container'>
 
     <div class = 'row justify-content-center pt-5'>
-        <div class = 'col-6 col-sm-8'>
+        <div class = 'col-8 col-sm-8'>
             <form>
                 <div class="form-group">
                     <label for="speechTextarea">Recognition</label>
-                    <textarea class="form-control" id="speechTextarea" rows='3'>John is a cute boy which likes to eat pizza. Sarah likes pizza too</textarea>
+                    <textarea class="form-control" id="speechTextarea" rows='3'>John is a cute boy which likes to eat pizza Margherita. Sarah likes pizza too, but she prefers Capricciosa</textarea>
                 </div>
                 <div class="form-group">
                     <button id = 'speechButton' type="button" class="btn btn-info">Speech</button>
@@ -37,13 +37,20 @@
     </div>
 
     <div class = 'row justify-content-center pt-2'>
-        <div class = 'col-6 col-sm-8'>
+        <div class = 'col-8 col-sm-8'>
             <form class = 'form-inline pt-2' style='border-top: 1px solid gray'>
                 <div class="form-group pr-2">
                     <label class="form-check-label">
                         <input id = 'speechContinuous' class="form-check-input" type="checkbox"> Continuous speech
                     </label>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <div class = 'row justify-content-center pt-2'>
+        <div class = 'col-8 col-sm-8'>
+            <form class = 'form-inline'>
                 <div class="form-group pr-2">
                     <label class="form-check-label">
                         <input id = 'ignoreVerbs' class="form-check-input" type="checkbox" checked> Ignore Verbs
@@ -66,21 +73,32 @@
                 </div>
                 <div class="form-group pr-2">
                     <label class="form-check-label">
-                        <input id = 'ignoreOther' class="form-check-input" type="checkbox" checked> Ignore Other
+                        <input id = 'ignoreOther' class="form-check-input" type="checkbox"> Ignore Other
                     </label>
                 </div>
             </form>
         </div>
     </div>
 
+    <div class = 'row justify-content-center pt-2'>
+        <div class = 'col-8 col-sm-8'>
+            <form class = 'form-inline'>
+                <div class="form-group pr-2">
+                    <label for="confidence" class = 'pr-2'>Confidence</label>
+                    <input type="number" class="form-control form-control-sm" min='0' max='1' step='0.1' value='0.8' id="confidence">
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class = 'row justify-content-center pt-3'>
-        <div class = 'col-6 col-sm-8'>
+        <div class = 'col-8 col-sm-8'>
             <button id = 'btn_annotate' class = 'btn btn-success'>Annotate</button>
         </div>
     </div>
 
     <div class = 'row justify-content-center pt-3 pb-3'>
-        <div class = 'col-6 col-sm-8'>
+        <div class = 'col-8 col-sm-8'>
             <div id = 'annotation' class = 'invisible'></div>
         </div>
     </div>
@@ -112,6 +130,10 @@ speech.bindCheckbox( 'speechContinuous' );
 // Init the ontology
 var rdf = new Module.RDF( 'assets/pizza.owl.xml', true );
 var RDFS = new Module.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
+var OWLN = new Module.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
+rdf.onload = function(){
+
+}
 
 var btn_annotate = document.getElementById( 'btn_annotate' );
 if( btn_annotate != null )
@@ -134,7 +156,7 @@ function annotate(){
     linker.ignorePlaces = document.getElementById('ignorePlaces').checked || false;
     linker.ignoreOther = document.getElementById('ignoreOther').checked || false;
 
-    var links = linker.link( null, RDFS.get('label'), null );
+    var links = linker.link( null, RDFS.get('label'), null, document.getElementById('confidence').value );
 
     // Show all the entities
 
@@ -153,8 +175,7 @@ function annotate(){
         text = text.replaceAll(
             l.token,
             '<u data-toggle="tooltip" data-placement="top" title="' + l.triple.subject + '">' + l.token + '</u>'
-        );
-        console.log(l.token.capitalizeFirstLetter());
+        );        
     }
 
     html.push( text );
@@ -162,6 +183,7 @@ function annotate(){
 
     annotation.innerHTML = html.join( '' );
 
+    // Enable bootstrap's tooltips
     $('[data-toggle="tooltip"]').tooltip();
 
 }
@@ -197,6 +219,25 @@ try{
 */
 </script>
 -->
+
+<script src='owl/owl.js'></script>
+<script src='owl/owl.namespace.js'></script>
+<script src='owl/owl.ontology.namespace.js'></script>
+<script src='owl/owl.ontology.header.js'></script>
+<script src='owl/owl.class.js'></script>
+
+<script>
+
+var owl = new OWL.Ontology();
+// Define namespaces
+var SPEECH = new OWL.Namespace( 'speech', 'http://www.example.org/speech#' );
+// Define ontology's Namespace
+owl.namespace.default().add( SPEECH.base() );
+
+// log the generated ontology
+console.log( owl.toString() );
+
+</script>
 
 </body>
 </html>

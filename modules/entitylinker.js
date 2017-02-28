@@ -26,7 +26,7 @@ Module.EntityLinker = function( inspector, ontology, debug ){
     this.ignorePlaces = false;
     this.ignoreOther = false;
 
-    this.link = function( subject, predicate, object ){
+    this.link = function( subject, predicate, object, confidence ){
         var checked = [];
         var links = [];
 
@@ -50,7 +50,7 @@ Module.EntityLinker = function( inspector, ontology, debug ){
                     continue;
                 checked.push( t.token );
 
-                var best = this.ontology.any(subject, predicate, object).match( t.token ).best();
+                var best = this.ontology.any(subject, predicate, object).match( t.token, confidence ).best();
                 if( best != null ){
                     links.push({
                         token: t.token,

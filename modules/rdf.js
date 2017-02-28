@@ -71,7 +71,7 @@ Module.RDF.Any = function( results, debug ){
         return this.context;
     }
 
-    this.match = function( match, field, confidence ){
+    this.match = function( match, confidence, field ){
         var matched = [];
         confidence = confidence || 0.8;
         field = field || 'object';
