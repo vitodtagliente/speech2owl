@@ -17,6 +17,7 @@ OWL.Ontology = function(){
     this.header = new OWL.Ontology.Header();
     this.classes = [];
     this.properties = [];
+    this.individuals = [];
 
     this.class = function( object ){
         for( var i = 0; i < this.classes.length; i++ ){
@@ -27,6 +28,18 @@ OWL.Ontology = function(){
         }
 
         this.classes.push( object );
+        return object;
+    }
+
+    this.individual = function( object ){
+        for( var i = 0; i < this.individuals.length; i++ ){
+            var c = this.individuals[i];
+
+            if( c.URI == object.URI )
+                return c;
+        }
+
+        this.individuals.push( object );
         return object;
     }
 
@@ -64,6 +77,14 @@ OWL.Ontology = function(){
 
         for( var i = 0; i < this.classes.length; i++ ){
             var c = this.classes[i];
+
+            xml.push( '' );
+            xml.push( c.toString() );
+            xml.push( '' );
+        }
+
+        for( var i = 0; i < this.individuals.length; i++ ){
+            var c =  this.individuals[i];
 
             xml.push( '' );
             xml.push( c.toString() );

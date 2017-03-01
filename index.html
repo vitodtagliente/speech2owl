@@ -113,12 +113,21 @@
 <script src='js/parser.js'></script>
 <script src='js/compromise.min.js'></script>
 <script src='js/jaro_winkler.js'></script>
-<script src='js/n3-browser.min.js'></script>
 
 <script src="modules/speech.js"></script>
 <script src='modules/nlp.js'></script>
 <script src='modules/rdf.js'></script>
 <script src='modules/entitylinker.js'></script>
+<script src='modules/ontologybuilder.js'></script>
+
+<script src='owl/owl.js'></script>
+<script src='owl/owl.namespace.js'></script>
+<script src='owl/owl.ontology.namespace.js'></script>
+<script src='owl/owl.ontology.header.js'></script>
+<script src='owl/owl.class.js'></script>
+<script src='owl/owl.property.js'></script>
+<script src='owl/owl.subclass.js'></script>
+<script src='owl/owl.individual.js'></script>
 
 <script>
 
@@ -161,7 +170,7 @@ function annotate(){
 
     var links = linker.link( null, RDFS.get('label'), null, document.getElementById('confidence').value );
 
-    // Show all the entities
+    // Show all the entities like the dbpedia's plugin
 
     var annotation = document.getElementById('annotation');
     annotation.className = annotation.className.replace('invisible', '');
@@ -190,6 +199,14 @@ function annotate(){
 
     // Enable bootstrap's tooltips
     $('[data-toggle="tooltip"]').tooltip();
+
+    // Create owl's representation
+    var builder = new Module.OntologyBuilder( inspector, links, true );
+    var ontology = builder.build();
+
+    // Make the ontology downloadable
+    btn_download.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent( ontology ));
+    btn_download.setAttribute('download', 'ontology.owl.xml');
 
 }
 
@@ -225,16 +242,8 @@ try{
 </script>
 -->
 
-<script src='owl/owl.js'></script>
-<script src='owl/owl.namespace.js'></script>
-<script src='owl/owl.ontology.namespace.js'></script>
-<script src='owl/owl.ontology.header.js'></script>
-<script src='owl/owl.class.js'></script>
-<script src='owl/owl.property.js'></script>
-<script src='owl/owl.subclass.js'></script>
-
 <script>
-
+/*
 var owl = new OWL.Ontology();
 // Define namespaces
 var SPEECH = new OWL.Namespace( 'speech', 'http://www.example.org/speech#' );
@@ -252,10 +261,7 @@ owl.class( new OWL.Class(
 
 // log the generated ontology
 console.log( owl.toString() );
-
-btn_download.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(owl.toString()));
-btn_download.setAttribute('download', 'annotation.owl.xml');
-
+*/
 </script>
 
 </body>
