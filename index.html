@@ -230,6 +230,8 @@ try{
 <script src='owl/owl.ontology.namespace.js'></script>
 <script src='owl/owl.ontology.header.js'></script>
 <script src='owl/owl.class.js'></script>
+<script src='owl/owl.property.js'></script>
+<script src='owl/owl.subclass.js'></script>
 
 <script>
 
@@ -240,11 +242,13 @@ var SPEECH = new OWL.Namespace( 'speech', 'http://www.example.org/speech#' );
 owl.namespace.default().add( SPEECH.base() );
 // Define classes
 owl.class( new OWL.Class(
-    'Americana'
-) ).subClassOf( 'NamedPizza' );
+    '#American'
+) ).subClassOf(
+    ( new OWL.SubClass( '#NamedPizza' ) )
+).label('eng', 'Americana');
 owl.class( new OWL.Class(
-    'Capricciosa'
-) ).subClassOf( 'NamedPizza' );
+    '#Capricciosa'
+) ).subClassOf('#NamedPizza');
 
 // log the generated ontology
 console.log( owl.toString() );

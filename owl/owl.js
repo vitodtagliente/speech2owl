@@ -19,18 +19,27 @@ OWL.Ontology = function(){
     this.properties = [];
 
     this.class = function( object ){
-        if( typeof(object) == 'string' ){
-            for( var i = 0; i < this.classes.length; i++ ){
-                var c = this.classes[i];
+        for( var i = 0; i < this.classes.length; i++ ){
+            var c = this.classes[i];
 
-                if( c.name == object )
-                    return c;
-            }
+            if( c.URI == object.URI )
+                return c;
         }
-        else {
-            this.classes.push( object );
-            return object;
+
+        this.classes.push( object );
+        return object;
+    }
+
+    this.property = function( object ){
+        for( var i = 0; i < this.properties.length; i++ ){
+            var p = this.properties[i];
+
+            if( p.URI == object.URI )
+                return p;
         }
+
+        this.properties.push( object );
+        return object;
     }
 
     this.toString = function(){
@@ -44,6 +53,14 @@ OWL.Ontology = function(){
         xml.push( '' );
         xml.push( this.header.toString() );
         xml.push( '' );
+
+        for( var i = 0; i < this.properties.length; i++ ){
+            var p = this.properties[i];
+
+            xml.push( '' );
+            xml.push( p.toString() );
+            xml.push( '' );
+        }
 
         for( var i = 0; i < this.classes.length; i++ ){
             var c = this.classes[i];
