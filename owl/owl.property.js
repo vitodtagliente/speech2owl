@@ -8,7 +8,7 @@ OWL.Property = function( URI ){
             return '#' + text;
         return text;
     }
-    
+
     this.URI = this.normalize( URI );
     this._subPropertyOf = null;
     this._comments = [];
@@ -16,6 +16,7 @@ OWL.Property = function( URI ){
     this._range = null;
     this._type = [];
     this._inverseOf = null;
+    this._isDatatype = false;
 
     this.subPropertyOf = function( name ){
         this._subPropertyOf = this.normalize( name );
@@ -60,11 +61,18 @@ OWL.Property = function( URI ){
         return this;
     }
 
+    this.datatype = function(){
+        this._isDatatype = true;
+        return this;
+    }
+
     this.toString = function(){
 
         var xml = [];
 
-        xml.push( '<owl:ObjectProperty rdf:about="' + this.URI + '">' );
+        if( this._isDatatype )
+            xml.push( '<owl:DatatypeProperty rdf:about="' + this.URI + '">' );
+        else xml.push( '<owl:ObjectProperty rdf:about="' + this.URI + '">' );
 
         for( var i = 0; i < this._type.length; i++ ){
             var t = this._type[i];
@@ -84,13 +92,20 @@ OWL.Property = function( URI ){
         if( this._domain != null )
             xml.push( '\t<rdfs:domain rdf:resource="' + this._domain + '"/>' );
 
-        if( this._range != null )
-            xml.push( '\t<rdfs:range rdf:resource="' + this._range + '"/>' );
+        if( this._range != null ){
+            var value = this._range;
+            if( this._isDatatype )
+                value = '&xsd;' + this._range;
+
+            xml.push( '\t<rdfs:range rdf:resource="' + value + '"/>' );
+        }
 
         if( this._inverseOf != null )
             xml.push( '\t<owl:inverseOf rdf:resource="' + this._inverseOf + '"/>' );
 
-        xml.push( '</owl:ObjectProperty>' );
+        if( this._isDatatype )
+            xml.push( '</owl:DatatypeProperty>' );
+        else xml.push( '</owl:ObjectProperty>' );
 
         return xml.join( "\n" );
 
