@@ -1,4 +1,21 @@
 
+/*
+
+    HOW TO:
+    // Create a namespace
+    var RDFS = new OWL.Namespace( 'http://...' );
+    // get the URI of a particular resource in the RDFS namespace
+    RDFS.get( 'label' ) // -> http://..........#label
+    //
+
+    HOW TO add namespaces to the ontology:
+    var owl = new OWL.Onotlogy();
+
+    var RDFS = new OWL.Namespace( 'http://.........' );
+    owl.namespace.add( RDFS );
+
+*/
+
 var OWL = OWL || {};
 
 OWL.Namespace = function( name, URI ){
@@ -6,9 +23,14 @@ OWL.Namespace = function( name, URI ){
     this.URI = URI;
     this.isBase = false;
 
+    // set this namespace as the base namespace for the ontology
     this.base = function(){
         this.isBase = true;
         return this;
+    }
+
+    this.get = function( resource ){
+        return this.URI + resource;
     }
 }
 

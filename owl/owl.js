@@ -5,8 +5,10 @@
     HOW TO:
     // Create a new OWL object
     var owl = new OWL();
-
-
+    //
+    ... add classes, individuals ....
+    // build the output
+    var ontology = owl.toString();
 */
 
 var OWL = OWL || {};
@@ -19,7 +21,18 @@ OWL.Ontology = function(){
     this.properties = [];
     this.individuals = [];
 
+    /*
+     * params: OWL.Class or String (URI)
+     * returns [OWL.Class]
+     * this method adds a class to the ontology
+     * example:
+     * owl.class( new OWL.Class( '#Generic' ) );
+     * owl.class( '#Generic' );
+    */
     this.class = function( object ){
+        if( typeof( object ) == 'string' )
+            object = new OWL.Class( object );
+
         for( var i = 0; i < this.classes.length; i++ ){
             var c = this.classes[i];
 
@@ -31,7 +44,19 @@ OWL.Ontology = function(){
         return object;
     }
 
-    this.individual = function( object ){
+    /*
+     * params: OWL.Individual or String, String (IndividualURI, ClassURI)
+     * returns [OWL.Individual]
+     * this method adds an individual to the ontology
+     * example:
+     * owl.individual( new OWL.Individual( '#Generic1', '#Generic' ) );
+     * owl.individual( '#Generic1', '#Generic' );
+    */
+    this.individual = function( object, classURI ){
+        if( typeof( object ) == 'string' && classURI != null ){
+            object = new OWL.Individual( object, classURI );
+        }
+
         for( var i = 0; i < this.individuals.length; i++ ){
             var c = this.individuals[i];
 
@@ -43,6 +68,13 @@ OWL.Ontology = function(){
         return object;
     }
 
+    /*
+     * params: OWL.Property
+     * returns [OWL.Property]
+     * this method adds a property to the ontology
+     * example:
+     * owl.property( new OWL.Property( ... ) );
+    */
     this.property = function( object ){
         for( var i = 0; i < this.properties.length; i++ ){
             var p = this.properties[i];
@@ -55,6 +87,7 @@ OWL.Ontology = function(){
         return object;
     }
 
+    // Generate the xml format
     this.toString = function(){
 
         var xml = [];
