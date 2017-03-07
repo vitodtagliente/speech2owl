@@ -13,6 +13,8 @@ OWL.Individual = function( URI, classURI ){
     this.classURI = classURI;
     this._datatypes = [];
     this._properies = [];
+    this._sameAs = null;
+    this._differentFrom = [];
 
     this.property = function(name, value){
         for( var i = 0; i < this._properies.length; i++ ){
@@ -27,6 +29,11 @@ OWL.Individual = function( URI, classURI ){
         this._properies.push({
             name: name, value: value
         });
+        return this;
+    }
+
+    this.differentFrom = function( value ){
+        this._differentFrom.push( value );
         return this;
     }
 
@@ -47,6 +54,11 @@ OWL.Individual = function( URI, classURI ){
         return this;
     }
 
+    this.sameAs = function( value ){
+        this._sameAs = value;
+        return this;
+    }
+
     this.toString = function(){
 
         var xml = [];
@@ -64,6 +76,15 @@ OWL.Individual = function( URI, classURI ){
             var d = this._datatypes[i];
 
             xml.push( '\t<' + d.name + ' rdf:datatype="&xsd;' + d.type + '">' + d.value + '</' + d.name + '>' );
+        }
+
+        if( this._sameAs != null )
+            xml.push( '\t<owl:sameAs rdf:resource="' + this._sameAs + '" />' );
+
+        for( var i = 0; i < this._differentFrom.length; i++ ){
+            var d = this._differentFrom[i];
+
+            xml.push( '\t<owl:differentFrom rdf:resource="' + d + '" />' );
         }
 
         xml.push( '</owl:Thing>' );

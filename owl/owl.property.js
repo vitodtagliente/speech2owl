@@ -46,6 +46,26 @@ OWL.Property = function( URI ){
         return this;
     }
 
+    this.transitive = function(){
+        this._type = '&owl;TransitiveProperty';
+        return this;
+    }
+
+    this.symmetric = function(){
+        this._type = '&owl;SymmetricProperty';
+        return this;
+    }
+
+    this.functional = function(){
+        this._type = '&owl;FunctionalProperty';
+        return this;
+    }
+
+    this.inverseFunctional = function(){
+        this._type = '&owl;InverseFunctionalProperty';
+        return this;
+    }
+
     this.domain = function( value ){
         this._domain = value;
         return this;

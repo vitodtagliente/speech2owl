@@ -126,8 +126,9 @@
 <script src='owl/owl.ontology.header.js'></script>
 <script src='owl/owl.class.js'></script>
 <script src='owl/owl.property.js'></script>
-<script src='owl/owl.subclass.js'></script>
 <script src='owl/owl.individual.js'></script>
+<script src='owl/owl.restriction.js'></script>
+<script src='owl/owl.utils.js'></script>
 
 <script>
 
@@ -140,6 +141,7 @@ speech.bindCheckbox( 'speechContinuous' );
 // Init the ontology
 var rdf = new Module.RDF( 'assets/pizza.owl.xml', true );
 var RDFS = new Module.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
+var RDF = new Module.RDF.Namespace( "http://www.w3.org/1999/02/22-rdf-syntax-ns#" );
 var OWLN = new Module.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
 rdf.onload = function(){
 
@@ -240,6 +242,10 @@ try{
 }
 */
 </script>
+-->
+
+<!--
+rdf.any(null, RDFS.get('label'), null).match('something')
 -->
 
 </body>

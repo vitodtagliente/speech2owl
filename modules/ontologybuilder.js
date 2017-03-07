@@ -40,7 +40,8 @@ Module.OntologyBuilder = function( inspector, links, debug ){
             new OWL.Property('#sentenceValue').datatype().domain('#Sentence').range('string')
         );
 
-        owl.class( '#Sentence' ).label( 'eng', 'Each SpeechText can contain multiple sentences' );
+        owl.class( '#Sentence' ).label( 'eng',
+        'Each SpeechText can contain multiple sentences' ).disjointWith('#SpeechText');
 
         var sentenceInspectors = this.inspector.data();
         var tokens = [];
