@@ -189,10 +189,22 @@ function annotate(){
     // Hide all popovers
     $( '.data_popover' ).popover('hide');
 
+    // Transform textarea
+    for( var  i = 0; i < links.length; i++ ){
+        var l = links[i];
+
+        // Do this transformation to fix some bugs
+        text = text.replaceAll(
+            l.token,
+            '$' + l.token + '$'
+        );
+    }
+
+    // popover content creation
     for( var i = 0; i < links.length; i++ ){
         var l = links[i];
+
         var content = [];
-        // Create popover content
         var search = rdf.any( l.triple.subject, RDFS.get('subClassOf'), null ).data();
         for( var j = 0; j < search.length; j++ ){
             var s  = search[j];
@@ -202,14 +214,6 @@ function annotate(){
             for( var z = 0; z < result.length; z++ ){
                 var r = result[z];
 
-                /*
-                if( r.object == OWLN.get('Restriction') )
-                    continue;
-                else if( r.object == OWLN.get('Class') )
-                    continue;
-                else if( r.predicate == RDFS.get('label') )
-                    continue;
-                */
                 if( r.predicate == OWLN.get('onProperty') )
                     this_content += ' ' + r.object.replace( PIZZA.get(''), '' );
                 else if( r.predicate == OWLN.get('someValuesFrom') )
@@ -217,23 +221,17 @@ function annotate(){
                 else if( r.predicate == OWLN.get('allValuesFrom') ){
                     this_content = null;
                 }
-                /*
-                else if( r.predicate == RDFS.get('subClassOf') ){
-                    this_content += ' <span style=\'color: purple\'>subClassOf</span> ' + r.object.replace( PIZZA.get(''), '' );
+                else if( r.predicate == OWLN.get('hasValue') ){
+                    this_content += ' <span style=\'color: purple\'>value</span> ' + r.object.replace( PIZZA.get(''), '' );
                 }
-                else if( r.predicate == RDFS.get('comment') ){
-                    if( this_content != '' ) this_content += '<br>';
-                    this_content += ' <span style=\'color: purple\'>comment</span> ' + r.object;
-                }
-                else this_content += ' ' + r.object.replace( PIZZA.get(''), '' );
-                */
             }
             if( this_content != null && this_content != '' )
                 content.push( this_content );
         }
 
+        // TEXT ANNOTATION
         text = text.replaceAll(
-            l.token,
+            '$' + l.token + '$',
             '<u class="data_popover" data-toggle="popover" data-placement="top" title="' + l.triple.subject + '" data-content="' + content.join('<br>') + '">' + l.token + '</u>'
         );
     }
