@@ -154,6 +154,8 @@ if( btn_annotate != null )
 
 var btn_download = document.getElementById('btn_download');
 
+var popovers = [];
+
 function annotate(){
 
     console.log( '------------- NLP -------------' );
@@ -185,6 +187,9 @@ function annotate(){
     var text = textarea.value.toLowerCase();
 
     html.push( '<p class="alert alert-success">' );
+
+    // Hide all popovers
+    $( '.data_popover' ).popover('hide');
 
     for( var i = 0; i < links.length; i++ ){
         var l = links[i];
@@ -228,11 +233,10 @@ function annotate(){
             if( this_content != null && this_content != '' )
                 content.push( this_content );
         }
-        // end create popover content
 
         text = text.replaceAll(
             l.token,
-            '<u data-toggle="popover" data-placement="top" title="' + l.triple.subject + '" data-content="' + content.join('<br>') + '">' + l.token + '</u>'
+            '<u class="data_popover" data-toggle="popover" data-placement="top" title="' + l.triple.subject + '" data-content="' + content.join('<br>') + '">' + l.token + '</u>'
         );
     }
 
