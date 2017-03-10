@@ -15,58 +15,107 @@
 
 var Module = Module || {};
 
-Module.EntityLinker = function( inspector, ontology, debug ){
+Module.EntityLinker = function( inspector, ontology, log ){
     this.inspector = inspector;
     this.ontology = ontology;
-    this.debug = debug || false;
-
-    this.ignoreVerbs = false;
-    this.ignoreAdjectives = false;
-    this.ignorePeople = false;
-    this.ignorePlaces = false;
-    this.ignoreOther = false;
+    this.log = log || false;
 
     this.link = function( subject, predicate, object, confidence ){
-        var checked = [];
         var links = [];
+        var checked = [];
 
-        if( this.debug )
-            console.log( 'EntityLinker::Tokens' );
+        if( this.log ){
+            console.log( '################## EntityLinker ##################');
+        }
 
-        for( var i = 0; i < this.inspector.data().length; i++ ){
-            var s = this.inspector.data()[i];
+        var sentences = this.inspector.data();
+        for( var i = 0; i < sentences.length; i++ ){
+            var s = sentences[i];
 
-            for( var j = 0; j < s.terms().length; j++ ){
-                var t = s.terms()[j];
-                console.log(t);
+            var tokens = s.valuableTokens();
+            if( this.log ){
+                console.log( "#EntityLinker::ValuableTokens" );
+                console.log( tokens );
+            }
+            for( var j = 0; j < tokens.length; j++ ){
+                var token = tokens[j];
 
-                if( checked.contains( t.token ) ||
-                    t.isVerb && this.ignoreVerbs ||
-                    t.isAdjective && this.ignoreAdjectives ||
-                    t.isPeople && this.ignorePeople ||
-                    t.isPlace && this.ignorePlaces ||
-                    t.isOther && this.ignoreOther
-                )
-                    continue;
-                checked.push( t.token );
+                if( this.log )
+                    console.log(token);
 
-                var best = this.ontology.any(subject, predicate, object).match( t.token, confidence ).best();
-                if( best != null ){
-                    links.push({
-                        token: t.token,
-                        triple: {
-                            subject: best.subject,
-                            predicate: best.predicate,
-                            object: best.object,
+                if( typeof( token ) == 'string' ){
+                    if( checked.contains( token ) )
+                        continue;
+                    checked.push( token );
+
+                    var best = this.ontology.any(subject, predicate, object).match( token, confidence ).best();
+                    if( best != null ){
+                        links.push({
+                            token: token,
+                            triple: {
+                                subject: best.subject,
+                                predicate: best.predicate,
+                                object: best.object,
+                            }
+                        });
+                    }
+
+                }
+                else {
+
+                    var temp = [];
+
+                    for( var z = 0; z < token.length; z++ ){
+                        var element = token[z];
+
+                        if( checked.contains( element ) )
+                            continue;
+                        checked.push( element );
+
+                        var best = this.ontology.any(subject, predicate, object).match( element, confidence ).best();
+                        if( best != null ){
+                            temp.push({
+                                token: element,
+                                distance: best.distance,
+                                triple: {
+                                    subject: best.subject,
+                                    predicate: best.predicate,
+                                    object: best.object,
+                                }
+                            });
                         }
-                    });
+                    }
+
+                    if( temp.length > 0 ){
+                        var first = temp[0];
+
+                        for( var z = 1; z < temp.length; z++ )
+                            if( first.distance < temp[z].distance )
+                                temp[0] = null;
+
+                        if( temp[0] == null ){
+                            for( var z = 1; z < temp.length; z++ )
+                                links.push({
+                                    token: temp[z].token,
+                                    triple: temp[z].triple
+                                });
+                        }
+                        else links.push({
+                            token: first.token,
+                            triple: first.triple
+                        });
+                    }
+
                 }
             }
 
         }
 
-        console.log( 'EntityLinker::Links' );
-        console.log( links );
+        if( this.log ){
+            console.log( 'EntityLinker::Links' );
+            console.log( links );
+            console.log( '##################################################');
+        }
 
         return links;
     }

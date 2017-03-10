@@ -1,132 +1,143 @@
 
-if( nlp === undefined )
-    //var nlp = require( 'compromise' );
-    var nlp = window.nlp;
+var speech2owl = speech2owl || {};
 
-var Module = Module || {};
+speech2owl.NLP = function( text, nlp_response ){
+    this.text = text || '';
 
-Module.NLP = {};
+    this.sentences = [];
 
-Module.NLP.pronouns = [
-    'I', 'you', 'he', 'she', 'it', 'we', 'they'
-];
+    var output = [];
 
-Module.NLP.Inspector = function( text ){
+    for( var i = 0; i < nlp_response.length; i++ ){
+        var s = nlp_response[i];
 
-    this.sentences = nlp(text).sentences().out('array');
+        this.sentences.push( s.sentence );
 
-    this.output = [];
-
-    for( var i = 0; i < this.sentences.length; i++ ){
-        var sentence = this.sentences[i];
-        var processed = new Module.NLP.SentenceInspector( sentence );
-        this.output.push( processed );
+        var processed = new speech2owl.NLP.SentenceInspector( nlp_response[i] );
+        output.push( processed );
     }
 
     this.data = function(){
-        return this.output;
+        return output;
     }
-
 }
 
-Module.NLP.SentenceInspector = function( text ){
-    this.sourceText = text;
-
-    this.r = nlp( text );
+speech2owl.NLP.SentenceInspector = function( response ){
+    this.text = response.sentence;
 
     // Tokenize
-    this.tokens = this.r.terms().out('array');
+    this.tokens = [];
 
     // find verbs, adjectives, nouns, adverbs, conjunctions
-    this.verbs = this.r.verbs().out('array');
-    this.nouns = this.r.nouns().out('array');
-    this.adjectives = this.r.adjectives().out('array');
-    this.adverbs = this.r.adverbs().out('array');
+    this.verbs = [];
+    this.nouns = [];
+    this.adjectives = [];
+    this.adverbs = [];
+    this.pronouns = [];
+    this.conjuctions = [];
+    this.articles = [];
+    this.other = [];
 
-    this.findOther = function(){
-        var result = [];
-        for( var i = 0; i < this.tokens.length; i++ ){
-            var t = this.tokens[i];
-            if(
-                this.nouns.contains( t ) == false &&
-                this.adjectives.contains( t ) == false &&
-                this.adverbs.contains( t ) == false &&
-                this.verbs.contains( t ) == false
-            )
-            result.push( t );
-        }
-        return result;
-    }
-    this.other = this.findOther();
+    // Constructor
 
-    this.topics = this.r.topics().out('array');
-    this.people = this.r.people().out('array');
-    this.places = this.r.places().out('array');
+    for( var i = 0; i < response.terms.length; i++ ){
+        var term = response.terms[i];
 
-    this.preprocess = function(){
-        this.processed.text = this.sourceText;
+        this.tokens.push( term.token );
 
-        /*
-        for( var i = 0; i < this.other.length; i++ ){
-            var c  = this.other[i];
-            this.processed.text = this.processed.text.replace(c, '');
-        }
-        */
+        if( term.tag == 'VERB' )
+            this.verbs.push( term.token );
+        else if( term.tag == 'NOUN' )
+            this.nouns.push( term.token );
+        else if( term.tag == 'ADJ' )
+            this.adjectives.push( term.token );
+        else if( term.tag == 'ADV' )
+            this.adverbs.push( term.token );
+        else if( term.tag == 'CONJ' )
+            this.conjuctions.push( term.token );
+        else if( term.tag == 'PRON' )
+            this.pronouns.push( term.token );
+        else if( term.tag == 'DET' )
+            this.articles.push( term.token );
+        else this.other.push( term.token );
 
-        for( var i = 0; i < this.adverbs.length; i++ ){
-            var c  = this.adverbs[i];
-            this.processed.text = this.processed.text.replace(c, '');
-        }
-
-        this.processed.text = this.processed.text.replace('  ', ' ' ).trim();
-
-        this.processed.r = nlp(this.processed.text);
-        this.processed.ngrams = this.processed.r.ngrams().out('array');
-        this.processed.startGrams = this.processed.r.startGrams().out('array');
-        this.processed.endGrams = this.processed.r.endGrams().out('array');
-
-        this.processed.tokens = this.processed.r.terms().out('array');
-        this.processed.terms = [];
-
-        for( var i = 0; i < this.processed.tokens.length; i++ ){
-            var t = this.processed.tokens[i];
-
-            var term = {
-                token: t,
-                isVerb: this.verbs.contains( t ),
-                isAdjective: this.adjectives.contains( t ),
-                isNoun: this.nouns.contains( t ),
-                isPeople: this.people.contains( t ),
-                isPlace: this.places.contains( t ),
-                isTopic: this.topics.contains( t ),
-                isOther: this.other.contains( t )
-            };
-
-            this.processed.terms.push( term );
-        }
     }
 
-    this.terms = function(){
-        return this.processed.terms;
+    // Constructor
+
+    this.isNoun = function( word ){
+        return this.nouns.contains( word );
     }
 
-    this.processed = {};
-    this.preprocess();
-
-    this.triples = [];
-
-    this.process = function(){
-        if( this.processed.startGrams[0] == this.processed.endGrams[0] ){
-            // Probabilmente soggetto-predicato-oggetto
-
-        }
-        else
-        {
-
-        }
+    this.isVerb = function( word ){
+        return this.verbs.contains( word );
     }
 
-    this.triples = this.process();
+    this.isAdjective = function( word ){
+        return this.adjectives.contains( word );
+    }
+
+    this.isConjuction = function( word ){
+        return this.conjuctions.contains( word );
+    }
+
+    this.valuableTokens = function(){
+        var data = this.tokens;
+        var toks = [];
+
+        for( var i = 0; i < data.length; i++ ){
+            var token = data[i];
+
+            if( this.isNoun(token) ){
+                var element = token;
+
+                if( i + 1 < data.length ){
+                    if( this.isNoun(data[i+1]) ){
+                        element = [
+                            token + ' ' + data[i+1],
+                            token,
+                            data[i+1]
+                        ];
+                        i++;
+                    }
+                    else if( this.isConjuction(data[i+1]) && i + 2 < data.length && this.isNoun(data[i+2]) ){
+                        element = [
+                            token + ' ' + data[i+1] + ' ' + data[i+2],
+                            token,
+                            data[i+2]
+                        ];
+                        i+=2;
+                    }
+                }
+
+                toks.push( element );
+            }
+            else if( this.isVerb(token) ){
+                var element = token;
+
+                if( element.includes('ing') )
+                    toks.push( element );
+                else if( i + 1 < data.length && this.isVerb(data[i+1]) && data[i+1].includes('ing') ){
+                    toks.push( [
+                        element + ' ' + data[i+1],
+                        element,
+                        data[i+1] 
+                    ]);
+                    i++;
+                }
+
+            }
+            else if( this.isAdjective(token) )
+                toks.push( token );
+
+        }
+
+        return toks;
+    }
+
+    this.relations = function(){
+
+    }
 }
 
 Array.prototype.contains = function(obj) {

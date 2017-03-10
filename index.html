@@ -47,7 +47,7 @@
             </form>
         </div>
     </div>
-
+    <!--
     <div class = 'row justify-content-center pt-2'>
         <div class = 'col-8 col-sm-8'>
             <form class = 'form-inline'>
@@ -79,7 +79,7 @@
             </form>
         </div>
     </div>
-
+-->
     <div class = 'row justify-content-center pt-2'>
         <div class = 'col-8 col-sm-8'>
             <form class = 'form-inline'>
@@ -106,12 +106,14 @@
 
 </div>
 
-<script src='js/jquery-3.1.1.slim.min.js'></script>
+<script src='js/jquery-3.1.1.min.js'></script>
 <script src='js/tether.min.js'></script>
 <script src='js/bootstrap.min.js'></script>
 
 <script src='js/parser.js'></script>
+<!--
 <script src='js/compromise.min.js'></script>
+-->
 <script src='js/jaro_winkler.js'></script>
 
 <script src="speech2owl/speech.js"></script>
@@ -139,7 +141,7 @@ var speech = new Module.Speech( 'speechTextarea', 'speechButton', true );
 speech.bindCheckbox( 'speechContinuous' );
 
 // Init the ontology
-var rdf = new Module.RDF( 'assets/pizza.owl.xml', true );
+var rdf = new Module.RDF( 'assets/pizza.owl.xml', false );
 var RDFS = new Module.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
 var RDF = new Module.RDF.Namespace( "http://www.w3.org/1999/02/22-rdf-syntax-ns#" );
 var OWLN = new Module.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
@@ -148,29 +150,39 @@ rdf.onload = function(){
 
 }
 
+var nlp = null;
+
 var btn_annotate = document.getElementById( 'btn_annotate' );
 if( btn_annotate != null )
-    btn_annotate.onclick = annotate;
+    btn_annotate.onclick = nlpRequest;
 
 var btn_download = document.getElementById('btn_download');
 
+function nlpRequest(){
+
+    var ajaxRequest = $.ajax({
+        'url': 'nlp/',
+        'data': {
+            text: textarea.value
+        },
+        'headers': {'Accept': 'application/json'},
+        'success': function( response ){
+
+            console.log( 'NLP Request::Success' );
+            nlp = new speech2owl.NLP( textarea.value, response );
+            annotate();
+
+        },
+        'error': function( response ){
+            annotation.innerHTML = html.join( '<p class="alert alert-success">Unable to reach the server</p>');
+        }
+    });
+
+}
+
 function annotate(){
 
-    console.log( '------------- NLP -------------' );
-
-    var inspector = new Module.NLP.Inspector( textarea.value );
-    console.log( inspector.sentences );
-    console.log( inspector.data() );
-
-    console.log( '-------------------------------' );
-
-    var linker = new Module.EntityLinker( inspector, rdf, true );
-    linker.ignoreVerbs = document.getElementById('ignoreVerbs').checked || false;
-    linker.ignoreAdjectives = document.getElementById('ignoreAdjectives').checked || false;
-    linker.ignorePeople = document.getElementById('ignorePeople').checked || false;
-    linker.ignorePlaces = document.getElementById('ignorePlaces').checked || false;
-    linker.ignoreOther = document.getElementById('ignoreOther').checked || false;
-
+    var linker = new Module.EntityLinker( nlp, rdf, true );
     var links = linker.link( null, RDFS.get('label'), null, document.getElementById('confidence').value );
 
     // Show all the entities like the dbpedia's plugin
@@ -182,7 +194,7 @@ function annotate(){
 
     var html = [];
 
-    var text = textarea.value.toLowerCase();
+    var text = textarea.value;
 
     html.push( '<p class="alert alert-success">' );
 
@@ -245,7 +257,7 @@ function annotate(){
     $('[data-toggle="popover"]').popover({ html:true });
 
     // Create owl's representation
-    var builder = new Module.OntologyBuilder( inspector, links, false );
+    var builder = new Module.OntologyBuilder( nlp, links, false );
     var ontology = builder.build();
 
     // Make the ontology downloadable

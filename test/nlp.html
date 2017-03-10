@@ -6,11 +6,13 @@
 
 <script src='../js/jquery-3.1.1.min.js'></script>
 <script src='../js/compromise.min.js'></script>
-<script src='../speech2owl/nlp.processor.js'></script>
+<script src='../speech2owl/nlp.js'></script>
 
 <script>
 
-var text = 'John is a boy which likes eating pizza Margherita. Sarah likes pizza too, but she prefers Capricciosa';
+var text = 'This is never going to be an awesome test';
+
+var nlp = null;
 
 console.log( '-------------------------------' );
 
@@ -30,10 +32,15 @@ var ajaxRequest = $.ajax({
 
 });
 
-var nlp = null;
-
 function annotate( response ){
-    var nlp = new speech2owl.NLP( text, response, true );
+    nlp = new speech2owl.NLP( text, response, true );
+    nlp.ignoreAdverbs = true;
+    nlp.ignoreConjuctions = true;
+    nlp.ignoreAgjectives = true;
+    nlp.ignoreDet = true;
+    nlp.ignoreVerbs = true;
+    nlp.ignorePronouns = true;
+
     console.log( nlp );
 }
 
