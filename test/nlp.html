@@ -4,19 +4,38 @@
 </head>
 <body>
 
+<script src='../js/jquery-3.1.1.min.js'></script>
 <script src='../js/compromise.min.js'></script>
-<script src='../modules/nlp.js'></script>
+<script src='../speech2owl/nlp.processor.js'></script>
 
 <script>
 
 var text = 'John is a boy which likes eating pizza Margherita. Sarah likes pizza too, but she prefers Capricciosa';
-console.log( '------------- NLP -------------' );
-
-var inspector = new Module.NLP.Inspector( text );
-console.log( inspector.sentences );
-console.log( inspector.data() );
 
 console.log( '-------------------------------' );
+
+var ajaxRequest = $.ajax({
+
+    'url': 'nlp/',
+    'data': {
+        text: text
+    },
+    'headers': {'Accept': 'application/json'},
+    'success': function( response ){
+        annotate( response );
+    },
+    'error': function( response ){
+        console.log( response );
+    }
+
+});
+
+var nlp = null;
+
+function annotate( response ){
+    var nlp = new speech2owl.NLP( text, response, true );
+    console.log( nlp );
+}
 
 </script>
 
