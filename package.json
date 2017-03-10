@@ -1,0 +1,27 @@
+{
+  "name": "speech2owl",
+  "version": "1.0.0",
+  "description": "Creating an owl ontology starting from speech recognition",
+  "main": "main.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitodtagliente/speech2owl.git"
+  },
+  "keywords": [
+    "owl",
+    "speech"
+  ],
+  "author": "Vito Domenico Tagliente",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vitodtagliente/speech2owl/issues"
+  },
+  "homepage": "https://github.com/vitodtagliente/speech2owl#readme"
+}

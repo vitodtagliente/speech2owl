@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>NLP Test</title>
+</head>
+<body>
+
+<script src='../js/compromise.min.js'></script>
+<script src='../modules/nlp.js'></script>
+
+<script>
+
+var text = 'John is a boy which likes eating pizza Margherita. Sarah likes pizza too, but she prefers Capricciosa';
+console.log( '------------- NLP -------------' );
+
+var inspector = new Module.NLP.Inspector( text );
+console.log( inspector.sentences );
+console.log( inspector.data() );
+
+console.log( '-------------------------------' );
+
+</script>
+
+</body>
+</html>
