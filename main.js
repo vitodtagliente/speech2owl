@@ -2,6 +2,7 @@
 var express = require('express');
 var app = express();
 var path = require("path");
+var colors = require('colors');
 
 app.use(express.static('public'));
 
@@ -13,69 +14,45 @@ app.get('/test', function (req, res) {
     res.sendFile(path.join(__dirname+'/test/nlp.html'));
 });
 
-app.get('/nlp-compromise', function (req, res) {
-
-    console.log( req.query );
-    var text = req.query.text || '';
-
-
-});
-
 app.get('/nlp', function (req, res) {
 
-    console.log( req.query );
     var text = req.query.text || '';
     var output = [];
 
-    console.log( 'NLP::Text = ' + text );
+    var pos = require('pos');
 
-    var salient = require('salient');
+    console.log( '' );
+    console.log( ('NLP::Text = ' + text).cyan );
 
     var sentences = text.split('.');
     for( var i = 0; i < sentences.length; i++ ){
         var sentence = sentences[i].trim();
         console.log( '' );
-        console.log( '###################################' );
-        console.log( '|---------------------------------|' );
+        console.log( sentence.yellow );
         console.log( '' );
-        console.log( sentence );
-        console.log( '' );
-        console.log( '|---------------------------------|' );
-        console.log( '###################################' );
-        console.log( '' );
-        // Tokenization
-        var tokenizer = new salient.tokenizers.RegExpTokenizer({ pattern: /\W+/ });
-        var tokens = tokenizer.tokenize( sentence );
-        console.log( '###### NLP::Tokens ######' );
-        console.log( tokens );
-
-        var hmmTagger = new salient.tagging.HmmTagger();
-        var tags = hmmTagger.tag( tokens );
-        console.log( '###### NLP::Tags ######' );
-        console.log( tags );
-
-        var glossary = new salient.glossary.Glossary();
-        glossary.parse( text );
-        gson = glossary.toJSON();
-        console.log( '###### NLP::Glossay ######' );
-        console.log( gson );
-
+        // Processing
         var terms = [];
-        for( var j = 0; j < tokens.length; j++ ){
+        var words = new pos.Lexer().lex( sentence );
+        var tagger = new pos.Tagger();
+        var taggedWords = tagger.tag(words);
+        for (j in taggedWords) {
+            var taggedWord = taggedWords[j];
+            var word = taggedWord[0];
+            var tag = taggedWord[1];
+            console.log(word + " /".cyan + tag.cyan);
             terms.push({
-                token: tokens[j],
-                tag: tags[j]
-            })
+                token: word,
+                tag: tag
+            });
         }
 
         output.push({
             sentence: sentence,
-            terms: terms,
-            glossary, gson
+            terms: terms
         });
     }
 
-    res.send( output );
+    res.send( output);
 });
 
 app.listen(8000, function () {

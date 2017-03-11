@@ -27,6 +27,7 @@ speech2owl.NLP.SentenceInspector = function( response ){
 
     // Tokenize
     this.tokens = [];
+    this.terms = response.terms;
 
     // find verbs, adjectives, nouns, adverbs, conjunctions
     this.verbs = [];
@@ -35,8 +36,10 @@ speech2owl.NLP.SentenceInspector = function( response ){
     this.adverbs = [];
     this.pronouns = [];
     this.conjuctions = [];
-    this.articles = [];
+    this.determiners = [];
     this.other = [];
+    this.whdeterminers = [];
+    this.entities = [];
 
     // Constructor
 
@@ -45,20 +48,25 @@ speech2owl.NLP.SentenceInspector = function( response ){
 
         this.tokens.push( term.token );
 
-        if( term.tag == 'VERB' )
+        if( term.tag.startsWith('VB') )
             this.verbs.push( term.token );
-        else if( term.tag == 'NOUN' )
+        else if( term.tag.startsWith('NN') ){
             this.nouns.push( term.token );
-        else if( term.tag == 'ADJ' )
+            if( term.tag == 'NNP' || 'NNPS' )
+                this.entities.push( term.token );
+        }
+        else if( term.tag.startsWith('JJ') )
             this.adjectives.push( term.token );
-        else if( term.tag == 'ADV' )
+        else if( term.tag.startsWith('RB') )
             this.adverbs.push( term.token );
-        else if( term.tag == 'CONJ' )
+        else if( term.tag == 'CC' )
             this.conjuctions.push( term.token );
-        else if( term.tag == 'PRON' )
+        else if( term.tag == 'PRP' )
             this.pronouns.push( term.token );
         else if( term.tag == 'DET' )
-            this.articles.push( term.token );
+            this.determiners.push( term.token );
+        else if( term.tag == 'WDT' )
+            this.whdeterminers.push( term.token );
         else this.other.push( term.token );
 
     }
@@ -67,6 +75,10 @@ speech2owl.NLP.SentenceInspector = function( response ){
 
     this.isNoun = function( word ){
         return this.nouns.contains( word );
+    }
+
+    this.isEntity = function( word ){
+        return this.entities.contains( word );
     }
 
     this.isVerb = function( word ){
@@ -81,63 +93,14 @@ speech2owl.NLP.SentenceInspector = function( response ){
         return this.conjuctions.contains( word );
     }
 
-    this.valuableTokens = function(){
-        var data = this.tokens;
-        var toks = [];
-
-        for( var i = 0; i < data.length; i++ ){
-            var token = data[i];
-
-            if( this.isNoun(token) ){
-                var element = token;
-
-                if( i + 1 < data.length ){
-                    if( this.isNoun(data[i+1]) ){
-                        element = [
-                            token + ' ' + data[i+1],
-                            token,
-                            data[i+1]
-                        ];
-                        i++;
-                    }
-                    else if( this.isConjuction(data[i+1]) && i + 2 < data.length && this.isNoun(data[i+2]) ){
-                        element = [
-                            token + ' ' + data[i+1] + ' ' + data[i+2],
-                            token,
-                            data[i+2]
-                        ];
-                        i+=2;
-                    }
-                }
-
-                toks.push( element );
-            }
-            else if( this.isVerb(token) ){
-                var element = token;
-
-                if( element.includes('ing') )
-                    toks.push( element );
-                else if( i + 1 < data.length && this.isVerb(data[i+1]) && data[i+1].includes('ing') ){
-                    toks.push( [
-                        element + ' ' + data[i+1],
-                        element,
-                        data[i+1] 
-                    ]);
-                    i++;
-                }
-
-            }
-            else if( this.isAdjective(token) )
-                toks.push( token );
-
-        }
-
-        return toks;
+    this.isWhDeterminer = function( word ){
+        return this.whdeterminers.contains( word );
     }
 
-    this.relations = function(){
-
+    this.isPronoun = function( word ){
+        return this.pronouns.contains( word );
     }
+
 }
 
 Array.prototype.contains = function(obj) {
