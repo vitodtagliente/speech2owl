@@ -60,6 +60,11 @@ speech2owl.NLP.SyntaxTree = function( s ){
             else if( s.isAdjective(token) ){
 
             }
+            else if( s.tag(term).isPronoun && currentTag.isNoun && currentTag.isEntity == false ){
+                current = current.up();
+                if( s.tag(current.data).isVerb )
+                    current = current.up();
+            }
             // se sono a livello di un verbo
             // come figli posso avere solo un nome nome || aggettivo nome || nome
             // se composto, espandi nei singoli
@@ -84,23 +89,11 @@ speech2owl.NLP.SyntaxTree = function( s ){
                 }
                 else current.add(term);
 
-                current = current.up();
-
+                //current = current.up();
+                current = current.down('last');
             }
 
         }
-    }
-
-    this.findNextObject = function(index){
-        var s = this.source;
-        // Find the root node
-        for( var i = index; i < s.terms.length; i++ ){
-            var term = s.terms[i];
-            if( s.isNoun(term.token) || s.isPronoun(term.token) ){
-                return term;
-            }
-        }
-        return null;
     }
 
     this.next = function(index){
