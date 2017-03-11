@@ -42,7 +42,6 @@ speech2owl.NLP.SyntaxTree = function( s ){
             // posso inserire come figlio un verbo o un verbo composto
             if( s.tag(term).isVerb ){
                 if( currentTag.isNoun || currentTag.isPronoun ){
-
                     var n = this.next(i);
                     if( n != null && s.tag(n).isVerb /*&& n.tag == 'VBG'*/ ){
                         current.add({
@@ -60,10 +59,13 @@ speech2owl.NLP.SyntaxTree = function( s ){
             else if( s.isAdjective(token) ){
 
             }
-            else if( s.tag(term).isPronoun && currentTag.isNoun && currentTag.isEntity == false ){
-                current = current.up();
-                if( s.tag(current.data).isVerb )
+            // Se trovo un pronome vado su
+            // fintanto che non tropo un pronome o una entità
+            else if( s.tag(term).isPronoun ){
+
+                while( current.parent != null && s.tag(current.data).isEntity == false )
                     current = current.up();
+                    
             }
             // se sono a livello di un verbo
             // come figli posso avere solo un nome nome || aggettivo nome || nome
