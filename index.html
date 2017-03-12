@@ -262,10 +262,11 @@ function annotate(){
     $('[data-toggle="popover"]').popover({ html:true });
 
     // Parse tree
-    console.log( 'SyntaxTrees' );
-    for( var i = 0; i < nlp.data().length; i++ )
+    console.log( 'NLP::SyntaxTrees' );
+    for( var i = 0; i < nlp.data().length; i++ ){
+        console.log( nlp.data()[i].text );
         console.log( nlp.data()[i].relations().toString() );
-
+    }
     // Create owl's representation
     var builder = new Module.OntologyBuilder( nlp, links, false );
     var ontology = builder.build();

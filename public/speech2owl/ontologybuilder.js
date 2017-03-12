@@ -1,8 +1,8 @@
 
 var Module = Module || {};
 
-Module.OntologyBuilder = function( inspector, links, debug ){
-    this.inspector = inspector;
+Module.OntologyBuilder = function( nlp, links, debug ){
+    this.nlp = nlp;
     this.links = links || [];
     this.debug = debug || false;
 
@@ -16,24 +16,32 @@ Module.OntologyBuilder = function( inspector, links, debug ){
         // Define ontology's Namespace
         owl.namespace.default().add( SPEECH.base() );
 
-        // Speech
+
+
         owl.property(
-            new OWL.Property('#make').domain('#Sentence').range('#Speech').inverseOf('#isMadeOf')
+            new OWL.Property('#isContainedIn').domain('#Sentence').range('#Speech').inverseOf('#containsSentence')
         );
 
         owl.property(
-            new OWL.Property('#isMadeOf').domain('#Speech').range('#Sentence').inverseOf('#make')
+            new OWL.Property('#containsSentence').domain('#Speech').range('#Sentence').inverseOf('#isContainedIn')
         );
 
         owl.property(
             new OWL.Property('#speechValue').datatype().domain('#Speech').range('string')
         );
 
-        owl.class( '#Speech' ).label( 'eng', 'This class represents the text given from Speech recognition' )
+        owl.property(
+            new OWL.Property('#sentenceValue').datatype().domain('#Sentence').range('string');
+        );
 
-        owl.individual(
-            '#GivenText', '#Speech'
-        ).datatype( 'speechValue', 'string', this.inspector.sentences.join( '. ' ) );
+        owl.class( '#Speech' ).label( 'eng', 'This class represents the text given from Speech recognition' )
+        owl.class( '#Sentence' );
+
+        for( var i = 0; i < this.nlp.data().length; i++ ){
+            var sentence = this.nlp.data()[i];
+
+            
+        }
 
         // Sentence
         owl.property(

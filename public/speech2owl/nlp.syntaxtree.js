@@ -2,14 +2,14 @@
 speech2owl.NLP.SyntaxTree = function( s ){
     this.sentence = s.text;
     this.root = null;
-    this.source = s;
+    this.source = s; // SentenceInspector
 
     this.init = function(){
         var s = this.source;
         // Find the root node
         for( var i = 0; i < s.terms.length; i++ ){
-            var term = s.terms[i];
-            if( s.isNoun(term.token) || s.isPronoun(term.token) ){
+            var term = s.term(i);
+            if( term.isNoun || term.isPronoun ){
                 this.root = new speech2owl.NLP.SyntaxTree.Node( term );
 
                 return;
@@ -31,23 +31,20 @@ speech2owl.NLP.SyntaxTree = function( s ){
                 continue;
             else checked.push(i);
 
-            var currentToken = current.data.token;
-            var currentTag = s.tag( current.data );
-
-            var term = s.terms[i];
-            var token = term.token;
-            var tag = s.tag(term);
+            var c = current.data; // current term of current node in tree
+            var term = s.term(i);
 
             // Se sono a livello di un nome
             // posso inserire come figlio un verbo o un verbo composto
-            if( s.tag(term).isVerb ){
-                if( currentTag.isNoun || currentTag.isPronoun ){
+            if( term.isVerb ){
+                if( c.isNoun || c.isPronoun ){
                     var n = this.next(i);
-                    if( n != null && s.tag(n).isVerb /*&& n.tag == 'VBG'*/ ){
-                        current.add({
+                    if( n != null && n.isVerb /*&& n.tag == 'VBG'*/ ){
+                        current.add( s.tag({
                             token: term.token + ' ' + n.token,
-                            tag: term.tag
-                        });
+                            tag: term.tag,
+                            tags: [term.tag, n.tag]
+                        }) );
                         checked.push(i+1);
                     }
                     else current.add(term);
@@ -56,31 +53,32 @@ speech2owl.NLP.SyntaxTree = function( s ){
 
                 }
             }
-            else if( s.isAdjective(token) ){
+            else if( term.isAdjective ){
 
             }
             // Se trovo un pronome vado su
             // fintanto che non tropo un pronome o una entità
-            else if( s.tag(term).isPronoun ){
+            else if( term.isPronoun ){
 
-                while( current.parent != null && s.tag(current.data).isEntity == false )
+                while( current.parent != null && c.isEntity == false )
                     current = current.up();
-                    
+
             }
             // se sono a livello di un verbo
             // come figli posso avere solo un nome nome || aggettivo nome || nome
             // se composto, espandi nei singoli
-            else if( currentTag.isVerb && ( tag.isNoun || tag.isAdjective ) ){
+            else if( c.isVerb && ( term.isNoun || term.isAdjective ) ){
 
                 var n = this.next(i);
-                if( n != null && s.tag(n).isNoun ){
-                    current.add({
+                if( n != null && n.isNoun ){
+                    current.add( s.tag({
                         token: term.token + ' ' + n.token,
-                        tag: term.tag + ' ' + n.tag
-                    });
+                        tag: term.tag,
+                        tags: [term.tag, n.tag]
+                    }) );
                     checked.push(i+1);
 
-                    if( tag.isNoun ){
+                    if( term.isNoun ){
                         current = current.down();
 
                         current.add(term);
@@ -99,9 +97,7 @@ speech2owl.NLP.SyntaxTree = function( s ){
     }
 
     this.next = function(index){
-        var s = this.source;
-        if( index < s.terms.length )
-            return s.terms[index+1];
+        return this.source.term(index+1);
     }
 
     this.toString = function(){
@@ -144,7 +140,15 @@ speech2owl.NLP.SyntaxTree.Node = function( data, parent ){
         var output = [];
         space = space || '';
 
-        output.push( space + this.data.token + ' /' + this.data.tag );
+        var text = space + this.data.token + ' /' + this.data.tag;
+        if( this.data['tags'] != undefined ){
+            text += ' [';
+            for(var i = 0; i < this.data['tags'].length; i++ )
+                text += ' ' + this.data['tags'][i];
+            text += ' ]';
+        }
+
+        output.push( text );
         space += '\t';
         for( var i = 0; i < this.children.length; i++ ){
             var c = this.children[i];

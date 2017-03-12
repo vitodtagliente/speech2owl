@@ -1,56 +1,60 @@
 
 speech2owl.NLP.SentenceInspector.prototype.valuableTokens = function(){
 
-    var data = this.tokens;
-    var toks = [];
+    var output = [];
 
-    for( var i = 0; i < data.length; i++ ){
-        var token = data[i];
+    for( var i = 0; i < this.count(); i++ ){
+        var term = this.term(i);
 
-        if( this.isNoun(token) ){
-            var element = token;
+        // Se il termine corrente è un nome
+        // cerca di raggrupparlo con possibili nomi successivi
+        if( term.isNoun ){
+            var element = term.token;
 
-            if( i + 1 < data.length ){
-                if( this.isNoun(data[i+1]) ){
+            if( i + 1 < this.count() ){
+                if( this.term(i+1).isNoun ){
                     element = [
-                        token + ' ' + data[i+1],
-                        token,
-                        data[i+1]
+                        term.token + ' ' + this.token(i+1),
+                        term.token,
+                        this.token(i+1)
                     ];
                     i++;
                 }
-                else if( this.isConjuction(data[i+1]) && i + 2 < data.length && this.isNoun(data[i+2]) ){
+                else if( this.term(i+1).isConjuction && i + 2 < this.count() && this.term(i+2).isNoun ){
                     element = [
-                        token + ' ' + data[i+1] + ' ' + data[i+2],
-                        token,
-                        data[i+2]
+                        term.token + ' ' + this.token(i+1) + ' ' + this.token(i+2),
+                        term.token,
+                        this.token(i+2)
                     ];
                     i+=2;
                 }
             }
 
-            toks.push( element );
+            output.push( element );
         }
-        else if( this.isVerb(token) ){
-            var element = token;
+        // Se il termine corrente è un verbo
+        // cerca di raggrupparlo con possibili verbi successivi
+        else if( term.isVerb ){
+            var element = term.token;
 
             if( element.includes('ing') )
-                toks.push( element );
-            else if( i + 1 < data.length && this.isVerb(data[i+1]) && data[i+1].includes('ing') ){
-                toks.push( [
-                    element + ' ' + data[i+1],
+                output.push( element );
+            else if( i + 1 < this.count() && this.term(i+1).isVerb && this.token(i+1).includes('ing') ){
+                output.push( [
+                    element + ' ' + this.token(i+1),
                     element,
-                    data[i+1]
+                    this.token(i+1)
                 ]);
                 i++;
             }
 
         }
-        else if( this.isAdjective(token) )
-            toks.push( token );
+        // Non ignorare gli aggettivi
+        else if( term.isAdjective )
+            output.push( term.token );
 
     }
 
-    return toks;
+    return output;
 
 }

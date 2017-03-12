@@ -27,7 +27,7 @@ speech2owl.NLP.SentenceInspector = function( response ){
 
     // Tokenize
     this.tokens = [];
-    this.terms = response.terms;
+    this.terms = [];
 
     // find verbs, adjectives, nouns, adverbs, conjunctions
     this.verbs = [];
@@ -42,89 +42,75 @@ speech2owl.NLP.SentenceInspector = function( response ){
     this.entities = [];
 
     // Constructor
-
     for( var i = 0; i < response.terms.length; i++ ){
-        var term = response.terms[i];
+        var t = response.terms[i];
 
-        this.tokens.push( term.token );
-        var token = new speech2owl.NLP.Token( term );
+        this.tokens.push( t.token );
+        var term = new speech2owl.NLP.Term( t );
+        this.terms.push( term );
 
-        if( token.isVerb )
-            this.verbs.push( token.text );
-        else if( token.isNoun ){
-            this.nouns.push( token.text );
-            if( token.isEntity )
-                this.entities.push( token.text );
+        if( term.isVerb )
+            this.verbs.push( term.token );
+        else if( term.isNoun ){
+            this.nouns.push( term.token );
+            if( term.isEntity )
+                this.entities.push( term.token );
         }
-        else if( token.isConjuction )
-            this.adjectives.push( token.text );
-        else if( token.isAdverb )
-            this.adverbs.push( token.text );
-        else if( token.isAdverb )
-            this.conjuctions.push( token.text );
-        else if( token.isPronoun )
-            this.pronouns.push( token.text );
-        else if( token.isDeterminer )
-            this.determiners.push( token.text );
-        else if( token.isWhDeterminer )
-            this.whdeterminers.push( token.text );
-        else this.other.push( token.text );
+        else if( term.isConjuction )
+            this.adjectives.push( term.token );
+        else if( term.isAdverb )
+            this.adverbs.push( term.token );
+        else if( term.isAdverb )
+            this.conjuctions.push( term.token );
+        else if( term.isPronoun )
+            this.pronouns.push( term.token );
+        else if( term.isDeterminer )
+            this.determiners.push( term.token );
+        else if( term.isWhDeterminer )
+            this.whdeterminers.push( term.token );
+        else this.other.push( term.token );
 
     }
 
-    // Constructor
-
-    this.isNoun = function( word ){
-        return this.nouns.contains( word );
+    this.term = function( index ){
+        if( index < this.terms.length )
+            return this.terms[index];
+        return null;
     }
 
-    this.isEntity = function( word ){
-        return this.entities.contains( word );
+    this.token = function( index ){
+        if( index < this.terms.length )
+            return this.terms[index].token;
+        return null;
     }
 
-    this.isVerb = function( word ){
-        return this.verbs.contains( word );
+    this.tag = function( obj ){
+        return new speech2owl.NLP.Term( obj );
     }
 
-    this.isAdjective = function( word ){
-        return this.adjectives.contains( word );
-    }
-
-    this.isConjuction = function( word ){
-        return this.conjuctions.contains( word );
-    }
-
-    this.isWhDeterminer = function( word ){
-        return this.whdeterminers.contains( word );
-    }
-
-    this.isPronoun = function( word ){
-        return this.pronouns.contains( word );
-    }
-
-    this.tag = function( term ){
-        return speech2owl.NLP.Token( term );
+    this.count = function(){
+        return this.terms.length;
     }
 
 }
 
-speech2owl.NLP.Token = function( term ){
+// term: {token:'', tag:''}
+
+speech2owl.NLP.Term = function( term ){
     if( term == null )
         term = { token: '', tag: '' };
-    var tag = term.tag;
-    return {
-        text: term.token,
-        tag: term.tag,
-        isVerb: tag.startsWith('VB'),
-        isNoun: tag.startsWith('NN'),
-        isEntity: tag == 'NNP' || tag == 'NNPS',
-        isAdjective: tag.startsWith('JJ'),
-        isAdverb: tag.startsWith('RB'),
-        isConjuction: tag == 'CC',
-        isPronoun: tag == 'PRP',
-        isDeterminer: tag == 'DET',
-        idWhDeterminer: tag == 'WDT'
-    };
+
+    term.isVerb = term.tag.startsWith('VB'),
+    term.isNoun = term.tag.startsWith('NN'),
+    term.isEntity = term.tag == 'NNP' || term.tag == 'NNPS',
+    term.isAdjective = term.tag.startsWith('JJ'),
+    term.isAdverb = term.tag.startsWith('RB'),
+    term.isConjuction = term.tag == 'CC',
+    term.isPronoun = term.tag == 'PRP',
+    term.isDeterminer = term.tag == 'DET',
+    term.idWhDeterminer = term.tag == 'WDT'
+
+    return term;
 }
 
 Array.prototype.contains = function(obj) {
