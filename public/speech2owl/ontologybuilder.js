@@ -17,7 +17,7 @@ Module.OntologyBuilder = function( nlp, links, debug ){
         owl.namespace.default().add( SPEECH.base() );
 
 
-
+        /*
         owl.property(
             new OWL.Property('#isContainedIn').domain('#Sentence').range('#Speech').inverseOf('#containsSentence')
         );
@@ -40,7 +40,7 @@ Module.OntologyBuilder = function( nlp, links, debug ){
         for( var i = 0; i < this.nlp.data().length; i++ ){
             var sentence = this.nlp.data()[i];
 
-            
+
         }
 
         // Sentence
@@ -59,7 +59,6 @@ Module.OntologyBuilder = function( nlp, links, debug ){
         owl.class( '#Sentence' ).label( 'eng',
         'Each SpeechText can contain multiple sentences' ).disjointWith('#Speech');
 
-        /*
         var sentenceInspectors = this.inspector.data();
         var tokens = [];
         for( var i = 0; i < sentenceInspectors.length; i++ ){
@@ -77,7 +76,6 @@ Module.OntologyBuilder = function( nlp, links, debug ){
                     tokens.push( t );
             }
         }
-        */
 
         // Word
         owl.property(
@@ -96,6 +94,8 @@ Module.OntologyBuilder = function( nlp, links, debug ){
         owl.property(
                 new OWL.Property('#linksTo').domain('#MatchedToken').range(PIZZA.get(''))
         );
+
+        */
 
         var output = owl.toString();
 

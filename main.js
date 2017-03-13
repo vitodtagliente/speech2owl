@@ -10,10 +10,6 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname+'/index.html'));
 });
 
-app.get('/test', function (req, res) {
-    res.sendFile(path.join(__dirname+'/test/nlp.html'));
-});
-
 app.get('/nlp', function (req, res) {
 
     var text = req.query.text || '';
