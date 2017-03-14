@@ -2,7 +2,7 @@
     HOW TO:
 
     // Parse an RDF+XML file
-    var rdf = new Module.RDF( 'filename', debug [true|false] );
+    var rdf = new speech2owl.RDF( 'filename', debug [true|false] );
     // debug enables/disables the console logs
 
     // find specified triples
@@ -17,18 +17,18 @@
     matches.best();
 */
 
-var Module = Module || {};
+var speech2owl = speech2owl || {};
 
-Module.RDF = function( filename, debug ){
+speech2owl.RDF = function( filename, debug ){
     this.rdf = new RDF();
     this.debug = debug || false;
 
-    Module.RDF.singleton = this;
+    speech2owl.RDF.singleton = this;
 
     // Initialization
     // parsing the file
     this.rdf.getRDFURL( filename, function(){
-        var context = Module.RDF.singleton;
+        var context = speech2owl.RDF.singleton;
 
         if( context.debug )
             console.log( 'RDF::Loaded' );
@@ -58,13 +58,13 @@ Module.RDF = function( filename, debug ){
             console.log( results );
         }
 
-        return new Module.RDF.Any( results, this.debug );
+        return new speech2owl.RDF.Any( results, this.debug );
     }
 }
 
-Module.RDF.singleton = null;
+speech2owl.RDF.singleton = null;
 
-Module.RDF.Any = function( results, debug ){
+speech2owl.RDF.Any = function( results, debug ){
     this.debug = debug || false;
     this.context = results;
 
@@ -92,11 +92,11 @@ Module.RDF.Any = function( results, debug ){
             console.log( matched );
         }
 
-        return new Module.RDF.Match( matched, this.debug );
+        return new speech2owl.RDF.Match( matched, this.debug );
     }
 }
 
-Module.RDF.Match = function( matches, debug ){
+speech2owl.RDF.Match = function( matches, debug ){
     this.debug = debug || false;
     this.context = matches;
 
@@ -126,7 +126,7 @@ Module.RDF.Match = function( matches, debug ){
     }
 }
 
-Module.RDF.Namespace = function( uri ){
+speech2owl.RDF.Namespace = function( uri ){
     this.uri = uri;
 
     this.get = function( text ){

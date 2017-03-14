@@ -1,7 +1,7 @@
 
-var Module = Module || {};
+var speech2owl = speech2owl || {};
 
-Module.OntologyBuilder = function( nlp, links, debug ){
+speech2owl.OntologyBuilder = function( nlp, links, debug ){
     this.nlp = nlp;
     this.links = links || [];
     this.debug = debug || false;

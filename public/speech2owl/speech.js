@@ -1,7 +1,7 @@
 
-var Module = Module || {};
+var speech2owl = speech2owl || {};
 
-Module.Speech = function( id_textarea, id_button, debug ){
+speech2owl.Speech = function( id_textarea, id_button, debug ){
 
     if ( 'webkitSpeechRecognition' in window ) {
         console.log("webkitSpeechRecognition is available");
@@ -20,7 +20,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
     // sta ascoltando???
     this.recognizing = false;
 
-    Module.Speech.singleton = this;
+    speech2owl.Speech.singleton = this;
 
     this.lang = function(arg) {
         if( arg != null )
@@ -30,7 +30,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
 
     // bind events
     this.recognition.onresult = function (event) {
-        var instance = Module.Speech.singleton;
+        var instance = speech2owl.Speech.singleton;
 
         if( instance.debug )
             console.log( "Speech::onresult" );
@@ -49,7 +49,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
     };
 
     this.recognition.onstart = function(){
-        var instance = Module.Speech.singleton;
+        var instance = speech2owl.Speech.singleton;
 
         instance.recognizing = true;
         instance.updateButton( 'Recognizing...', 'btn-warning' );
@@ -59,7 +59,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
     }
 
     this.recognition.onend = function(){
-        var instance = Module.Speech.singleton;
+        var instance = speech2owl.Speech.singleton;
 
         instance.recognizing = false;
         instance.updateButton( 'Speech', 'btn-info' );
@@ -70,7 +70,7 @@ Module.Speech = function( id_textarea, id_button, debug ){
 
     if( this.button != null ){
         this.button.onclick = function(){
-            var instance = Module.Speech.singleton;
+            var instance = speech2owl.Speech.singleton;
             if( instance.recognizing ){
                 instance.recognition.stop();
                 return;
@@ -86,9 +86,9 @@ Module.Speech = function( id_textarea, id_button, debug ){
             return;
 
         elem.onchange = function( value ){
-            Module.Speech.singleton.recognition.continuous = elem.checked;
+            speech2owl.Speech.singleton.recognition.continuous = elem.checked;
 
-            if( Module.Speech.singleton.debug )
+            if( speech2owl.Speech.singleton.debug )
                 console.log( "Speech::Continuous = " + elem.checked );
         }
     }
@@ -103,4 +103,4 @@ Module.Speech = function( id_textarea, id_button, debug ){
     }
 }
 
-Module.Speech.singleton = null;
+speech2owl.Speech.singleton = null;

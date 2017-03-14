@@ -108,15 +108,15 @@
 var textarea = document.getElementById('speechTextarea');
 
 // Init the speech module
-var speech = new Module.Speech( 'speechTextarea', 'speechButton', true );
+var speech = new speech2owl.Speech( 'speechTextarea', 'speechButton', true );
 speech.bindCheckbox( 'speechContinuous' );
 
 // Init the ontology
-var rdf = new Module.RDF( 'assets/pizza.owl.xml', false );
-var RDFS = new Module.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
-var RDF = new Module.RDF.Namespace( "http://www.w3.org/1999/02/22-rdf-syntax-ns#" );
-var OWLN = new Module.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
-var PIZZA = new Module.RDF.Namespace( 'http://www.co-ode.org/ontologies/pizza/pizza.owl#' );
+var rdf = new speech2owl.RDF( 'assets/pizza.owl.xml', false );
+var RDFS = new speech2owl.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
+var RDF = new speech2owl.RDF.Namespace( "http://www.w3.org/1999/02/22-rdf-syntax-ns#" );
+var OWLN = new speech2owl.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
+var PIZZA = new speech2owl.RDF.Namespace( 'http://www.co-ode.org/ontologies/pizza/pizza.owl#' );
 rdf.onload = function(){
 
 }
@@ -153,7 +153,7 @@ function nlpRequest(){
 
 function annotate(){
 
-    var linker = new Module.EntityLinker( nlp, rdf, true );
+    var linker = new speech2owl.EntityLinker( nlp, rdf, true );
     var links = linker.link( null, RDFS.get('label'), null, document.getElementById('confidence').value );
 
     // Show all the entities like the dbpedia's plugin
@@ -234,7 +234,7 @@ function annotate(){
         console.log( nlp.data()[i].relations().toString() );
     }
     // Create owl's representation
-    var builder = new Module.OntologyBuilder( nlp, links, false );
+    var builder = new speech2owl.OntologyBuilder( nlp, links, false );
     var ontology = builder.build();
 
     // Make the ontology downloadable
@@ -254,30 +254,6 @@ String.prototype.capitalizeFirstLetter = function() {
 }
 
 </script>
-
-
-<!--
-<script>
-/* RDFLIB.JS
-var $rdf = require('rdflib');
-var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#")
-
-var store = $rdf.graph();
-var contentType = 'application/rdf+xml';
-
-try{
-    $rdf.parse( file_content, store, 'https://example.org/resource.ttl', contentType);
-
-} catch(err){
-    console.log(err);
-}
-*/
-</script>
--->
-
-<!--
-rdf.any(null, RDFS.get('label'), null).match('something')
--->
 
 </body>
 </html>

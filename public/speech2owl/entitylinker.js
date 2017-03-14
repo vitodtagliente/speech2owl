@@ -3,7 +3,7 @@
     HOW TO:
 
     // Parse an RDF+XML file
-    var linker = new Module.EntityLinker( inspector, ontology, debug [true|false] );
+    var linker = new speech2owl.EntityLinker( inspector, ontology, debug [true|false] );
     // where:
     // - inspector is an instance of Module.NLP.Inspector
     // - ontology is an instance of Module.RDF
@@ -13,9 +13,9 @@
 
 */
 
-var Module = Module || {};
+var speech2owl = speech2owl || {};
 
-Module.EntityLinker = function( inspector, ontology, log ){
+speech2owl.EntityLinker = function( inspector, ontology, log ){
     this.inspector = inspector;
     this.ontology = ontology;
     this.log = log || false;
