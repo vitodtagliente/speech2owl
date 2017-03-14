@@ -1,13 +1,55 @@
 
 var speech2owl = speech2owl || {};
 
+/*
+    * HOW TO:
+
+    * Define a variable for nlp
+    var nlp = null;
+
+    * Execute a json request to the nlp API
+    var ajaxRequest = $.ajax({
+        'url': 'nlp',
+        'data': {
+            text: 'some text'
+        },
+        'headers': {'Accept': 'application/json'},
+        'success': onsuccess,
+        'error': function( response ){
+            // Do something
+        }
+    });
+
+    * Define an speech2owl.NLP instance using the API response
+    function onsuccess( response ){
+
+        nlp = new speech2owl.NLP( 'some text', response );
+
+    }
+
+    * Once we've initialized the nlp object
+    * we can access to its attributes:
+
+    * 1. we can get the source text
+    var text = nlp.text
+
+    * 2. we can get the text'sentences
+    var sentences = nlp.sentences; // returns an Array
+
+    * 3. we can get SentenceInspector instances
+    var inspectors = nlp.data(); // returns an Array
+
+*/
+
 speech2owl.NLP = function( text, nlp_response ){
     this.text = text || '';
 
+    // split the text in sentences
     this.sentences = [];
 
     var output = [];
 
+    // Initialization: process the data we've got by nlp API
     for( var i = 0; i < nlp_response.length; i++ ){
         var s = nlp_response[i];
 
@@ -17,19 +59,58 @@ speech2owl.NLP = function( text, nlp_response ){
         output.push( processed );
     }
 
+    // return an array of speech2owl.NLP.SentenceInspector
     this.data = function(){
         return output;
     }
 }
 
+/*
+
+    * HOW TO:
+
+    * A SentenceInspector is an object that holds all the information
+    * about the terms in the given sentence
+
+    * we can get the sentence's text
+    var sentence = inspector.text;
+
+    * we can access to tokens and terms
+    var tokens = inspector.tokens; // returns ['token1', 'token2', ...., 'tokenN']
+    var terms = inspector.terms; // returns an array of objects:
+        [
+            { token:'token_name', tag:'TOKEN_TAG', isNoun:bool, isVerb:bool, etc.. },
+            { token:'token_name', tag:'TOKEN_TAG', isNoun:bool, isVerb:bool, etc.. },
+            .....
+            { token:'token_name', tag:'TOKEN_TAG', isNoun:bool, isVerb:bool, etc.. }
+        ]
+
+    * we can get a token or term by index
+    var token = inspector.token(i);
+    var term = inspector.term(i);
+
+    * we can get the number of terms using:
+    var n = inspector.count();
+
+*/
+
 speech2owl.NLP.SentenceInspector = function( response ){
+    // the source text of the sentence
     this.text = response.sentence;
 
-    // Tokenize
+    // a token is equivalent to a string
     this.tokens = [];
+    /* a term is an object {
+        token: '',
+        tag: '',
+        isNoun: true or false,
+        isVerb: true or false
+        etc....
+    }
+    */
     this.terms = [];
 
-    // find verbs, adjectives, nouns, adverbs, conjunctions
+    // verbs, adjectives, nouns, adverbs, conjunctions found in the sentence
     this.verbs = [];
     this.nouns = [];
     this.adjectives = [];
@@ -41,7 +122,9 @@ speech2owl.NLP.SentenceInspector = function( response ){
     this.whdeterminers = [];
     this.entities = [];
 
-    // Constructor
+    // Initialization:
+    // we'll process all the token got by the nlp API response
+    // and we'll split them into verbs, nouns, etc...
     for( var i = 0; i < response.terms.length; i++ ){
         var t = response.terms[i];
 
@@ -72,30 +155,34 @@ speech2owl.NLP.SentenceInspector = function( response ){
 
     }
 
+    // Returns the term at the specified index
     this.term = function( index ){
         if( index < this.terms.length )
             return this.terms[index];
         return null;
     }
 
+    // returns the token at the specified index
     this.token = function( index ){
         if( index < this.terms.length )
             return this.terms[index].token;
         return null;
     }
 
+    // auto tag an object, where the object must be: {token:'', tag:''}
     this.tag = function( obj ){
         return new speech2owl.NLP.Term( obj );
     }
 
+    // returns the number of terms in sentence
     this.count = function(){
         return this.terms.length;
     }
 
 }
 
-// term: {token:'', tag:''}
 
+// term is an object: {token:'', tag:''}
 speech2owl.NLP.Term = function( term ){
     if( term == null )
         term = { token: '', tag: '' };

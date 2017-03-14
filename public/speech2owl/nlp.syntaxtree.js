@@ -1,4 +1,8 @@
 
+/*
+    Creates a syntax tree from a given SentenceInspector
+*/
+
 speech2owl.NLP.SyntaxTree = function( s ){
     this.sentence = s.text;
     this.root = null;
@@ -31,11 +35,11 @@ speech2owl.NLP.SyntaxTree = function( s ){
                 continue;
             else checked.push(i);
 
-            var c = current.data; // current term of current node in tree
+            var c = current.data; // the current term of current node in tree
             var term = s.term(i);
 
-            // Se sono a livello di un nome
-            // posso inserire come figlio un verbo o un verbo composto
+            // In this level there's a noun
+            // this node can have as children only a verb
             if( term.isVerb ){
                 if( c.isNoun || c.isPronoun ){
                     var n = this.next(i);
@@ -56,17 +60,16 @@ speech2owl.NLP.SyntaxTree = function( s ){
             else if( term.isAdjective ){
 
             }
-            // Se trovo un pronome vado su
-            // fintanto che non tropo un pronome o una entità
+            // If the current term is Pronoun
+            // I go up until I find a Pronoun or an Entity
             else if( term.isPronoun ){
 
                 while( current.parent != null && c.isEntity == false )
                     current = current.up();
 
             }
-            // se sono a livello di un verbo
-            // come figli posso avere solo un nome nome || aggettivo nome || nome
-            // se composto, espandi nei singoli
+            // In this level there's a verb
+            // this node can have as children a noun || adjective +  noun || noun + noun
             else if( c.isVerb && ( term.isNoun || term.isAdjective ) ){
 
                 var n = this.next(i);

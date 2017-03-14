@@ -1,4 +1,6 @@
 
+
+// returns the syntax tree representation of this sentence
 speech2owl.NLP.SentenceInspector.prototype.relations = function(){
 
     var output = [];

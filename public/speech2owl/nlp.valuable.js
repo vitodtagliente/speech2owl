@@ -1,4 +1,25 @@
 
+/*
+    This function returns valuable tokens
+    that could be used for entity annotation
+    insted of processing the simple tokens attribute
+
+    This algorithm match as 'valuable' only tokens that are nouns, verbs or
+    adjectives. More over, it try to merge terms togheter for better matching
+    results.
+
+    For example in a sentence: 'John likes eating pizza Margherita'
+    the output will be:
+    [
+        'John',
+        ['likes eating', 'likes', 'eating'],
+        ['pizza Margherita', 'pizza', 'Margherita']
+
+    ]
+
+    instead of a simple Tokenizer: ['John', 'likes', 'eating', 'pizza', 'Margherita']
+
+*/
 speech2owl.NLP.SentenceInspector.prototype.valuableTokens = function(){
 
     var output = [];
@@ -6,8 +27,8 @@ speech2owl.NLP.SentenceInspector.prototype.valuableTokens = function(){
     for( var i = 0; i < this.count(); i++ ){
         var term = this.term(i);
 
-        // Se il termine corrente è un nome
-        // cerca di raggrupparlo con possibili nomi successivi
+        // if the current term is a noun
+        // try to merge it with some next nouns
         if( term.isNoun ){
             var element = term.token;
 
@@ -32,8 +53,8 @@ speech2owl.NLP.SentenceInspector.prototype.valuableTokens = function(){
 
             output.push( element );
         }
-        // Se il termine corrente è un verbo
-        // cerca di raggrupparlo con possibili verbi successivi
+        // if the current term is a verb
+        // try to merge it with next verbs
         else if( term.isVerb ){
             var element = term.token;
 
@@ -49,7 +70,7 @@ speech2owl.NLP.SentenceInspector.prototype.valuableTokens = function(){
             }
 
         }
-        // Non ignorare gli aggettivi
+        // don't ignore adjectives
         else if( term.isAdjective )
             output.push( term.token );
 

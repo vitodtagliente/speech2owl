@@ -25,7 +25,8 @@ Module.RDF = function( filename, debug ){
 
     Module.RDF.singleton = this;
 
-    // parse file
+    // Initialization
+    // parsing the file
     this.rdf.getRDFURL( filename, function(){
         var context = Module.RDF.singleton;
 
@@ -79,7 +80,6 @@ Module.RDF.Any = function( results, debug ){
         for( var i = 0; i < this.context.length; i++ ){
             var r = this.context[i];
 
-            //var distance = natural.JaroWinklerDistance( match, r[field] );
             var distance = jaro_winkler.distance( match, r[field] );
             if( distance >= confidence ){
                 r.distance = distance;
