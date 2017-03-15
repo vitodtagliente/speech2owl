@@ -159,6 +159,11 @@ function annotate(){
     var linker = new speech2owl.EntityLinker( nlp, rdf, true );
     var links = linker.link( null, RDFS.get('label'), null, document.getElementById('confidence').value );
 
+    console.log( 'EntityLinker::Links');
+    for( var i = 0; i < links.length; i++ ){
+        console.log( links[i] );
+    }
+
     // Show all the entities like the dbpedia's plugin
 
     var annotation = document.getElementById('annotation');

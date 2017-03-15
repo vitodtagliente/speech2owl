@@ -32,7 +32,7 @@ OWL.Class = function( URI ){
         return this;
     }
 
-    this.equivalent = function( value ){
+    this.equivalentClass = function( value ){
         this._equivalentClass = value;
         return this;
     }
@@ -88,6 +88,9 @@ OWL.Class = function( URI ){
 
             xml.push( '\t<rdfs:label xml:lang="' + l.language + '">' + l.label + '</rdfs:label>' );
         }
+
+        if( this._equivalentClass != null )
+            xml.push( '\t<owl:equivalentClass rdf:resource="' + this._equivalentClass + '"/>' );
 
         xml.push( '</owl:Class>' );
 

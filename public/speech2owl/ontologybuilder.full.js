@@ -66,7 +66,7 @@ speech2owl.OntologyBuilder.Full = function( nlp, links, debug ){
         for( var i = 0; i < this.nlp.data().length; i++ ){
             var tree = this.nlp.data()[i].relations();
 
-
+            this.readTree( owl, tree.root );
         }
 
 
@@ -76,5 +76,54 @@ speech2owl.OntologyBuilder.Full = function( nlp, links, debug ){
             console.log( output );
 
         return output;
+    }
+
+    this.readTree = function( owl, node ){
+
+        if( node.data.isNoun ){
+            elem = owl.class('#'+node.data.token)
+                .subClassOf('#KnowledgeElement')
+                .subClassOf('#Noun');
+
+            if( node.parent != null && node.parent.data.isNoun ){
+                elem.subClassOf('#'+node.parent.data.token);
+            }
+
+            for( var i = 0; i < this.links.length; i++ ){
+                var l = this.links[i];
+
+                if( node.data.token == l.token ){
+                    elem.equivalentClass(l.triple.subject);
+                    break;
+                }
+            }
+        }
+        else if( node.data.isVerb ){
+            elem = owl.class('#relation_'+node.data.token)
+                .subClassOf('#KnowledgeRelation')
+                .subClassOf('#Verb');
+
+            if( parent != null && node.children[0] != null ){
+                var parentClass = owl.class('#'+node.parent.data.token);
+                var child = node.children[0];
+
+                parentClass.restriction(
+                    new OWL.Restriction()
+                        .onProperty('#'+node.data.token)
+                        .someValuesFrom('#'+child.data.token)
+                );
+                elem.restriction(
+                    new OWL.Restriction().onProperty('joins').someValuesFrom(parentClass.URI)
+                );
+                elem.restriction(
+                    new OWL.Restriction().onProperty('joins').someValuesFrom('#'+child.data.token)
+                );
+            }
+        }
+
+        for(var i = 0; i < node.children.length; i++ ){
+            this.readTree( owl, node.children[i] );
+        }
+
     }
 }
