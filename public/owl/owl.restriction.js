@@ -32,7 +32,7 @@ OWL.Restriction = function(){
     }
 
     this.someValuesFrom = function( value ){
-        this._someValuedFrom = value;
+        this._someValuesFrom = value;
         return this;
     }
 

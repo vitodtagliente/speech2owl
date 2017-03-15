@@ -47,22 +47,22 @@ OWL.Property = function( URI ){
     }
 
     this.transitive = function(){
-        this._type = '&owl;TransitiveProperty';
+        this.type('&owl;TransitiveProperty');
         return this;
     }
 
     this.symmetric = function(){
-        this._type = '&owl;SymmetricProperty';
+        this.type('&owl;SymmetricProperty');
         return this;
     }
 
     this.functional = function(){
-        this._type = '&owl;FunctionalProperty';
+        this.type('&owl;FunctionalProperty');
         return this;
     }
 
     this.inverseFunctional = function(){
-        this._type = '&owl;InverseFunctionalProperty';
+        this.type('&owl;InverseFunctionalProperty');
         return this;
     }
 

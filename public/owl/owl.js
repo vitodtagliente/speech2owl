@@ -76,6 +76,9 @@ OWL.Ontology = function(){
      * owl.property( new OWL.Property( ... ) );
     */
     this.property = function( object ){
+        if( typeof( object ) == 'string' )
+            object = new OWL.Property( object );
+
         for( var i = 0; i < this.properties.length; i++ ){
             var p = this.properties[i];
 

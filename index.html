@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="icon" href="img/brand.png">
 
-<title>SpeechOWL</title>
+<title>speech2owl</title>
 
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/app.css">
@@ -62,7 +62,8 @@
     <div class = 'row justify-content-center pt-3'>
         <div class = 'col-8 col-sm-8'>
             <button id = 'btn_annotate' class = 'btn btn-success'>Annotate</button>
-            <a id = 'btn_download' class = 'btn btn-danger invisible' href='#'>Download OWL</a>
+            <a id = 'btn_download_lite' class = 'btn btn-danger invisible' href='#'>Ontology Lite</a>
+            <a id = 'btn_download_full' class = 'btn btn-danger invisible' href='#'>Ontology Full</a>
         </div>
     </div>
 
@@ -91,7 +92,8 @@
 <script src='speech2owl/nlp.syntaxtree.js'></script>
 
 <script src='speech2owl/entitylinker.js'></script>
-<script src='speech2owl/ontologybuilder.js'></script>
+<script src='speech2owl/ontologybuilder.lite.js'></script>
+<script src='speech2owl/ontologybuilder.full.js'></script>
 
 <script src='owl/owl.js'></script>
 <script src='owl/owl.namespace.js'></script>
@@ -127,7 +129,8 @@ var btn_annotate = document.getElementById( 'btn_annotate' );
 if( btn_annotate != null )
     btn_annotate.onclick = nlpRequest;
 
-var btn_download = document.getElementById('btn_download');
+var btn_download_lite = document.getElementById('btn_download_lite');
+var btn_download_full = document.getElementById('btn_download_full');
 
 function nlpRequest(){
 
@@ -161,7 +164,8 @@ function annotate(){
     var annotation = document.getElementById('annotation');
     annotation.className = annotation.className.replace('invisible', '');
 
-    btn_download.className = btn_download.className.replace('invisible', '');
+    btn_download_lite.className = btn_download_lite.className.replace('invisible', '');
+    btn_download_full.className = btn_download_full.className.replace('invisible', '');
 
     var html = [];
 
@@ -227,19 +231,27 @@ function annotate(){
     // Enable bootstrap's tooltips
     $('[data-toggle="popover"]').popover({ html:true });
 
-    // Parse tree
+    // logs Parse trees
     console.log( 'NLP::SyntaxTrees' );
     for( var i = 0; i < nlp.data().length; i++ ){
         console.log( nlp.data()[i].text );
         console.log( nlp.data()[i].relations().toString() );
     }
+    /*
     // Create owl's representation
-    var builder = new speech2owl.OntologyBuilder( nlp, links, false );
+    var builder = new speech2owl.OntologyBuilder.Lite( nlp, links, false );
     var ontology = builder.build();
 
     // Make the ontology downloadable
-    btn_download.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent( ontology ));
-    btn_download.setAttribute('download', 'ontology.owl.xml');
+    btn_download_lite.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent( ontology ));
+    btn_download_lite.setAttribute('download', 'ontology.lite.owl');
+    */
+    builder = new speech2owl.OntologyBuilder.Full( nlp, links, true );
+    var ontology = builder.build();
+
+    // Make the ontology downloadable
+    btn_download_full.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent( ontology ));
+    btn_download_full.setAttribute('download', 'ontology.full.owl');
 
 }
 

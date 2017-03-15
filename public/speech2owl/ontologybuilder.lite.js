@@ -1,7 +1,8 @@
 
 var speech2owl = speech2owl || {};
+speech2owl.OntologyBuilder = speech2owl.OntologyBuilder || {};
 
-speech2owl.OntologyBuilder = function( nlp, links, debug ){
+speech2owl.OntologyBuilder.Lite = function( nlp, links, debug ){
     this.nlp = nlp;
     this.links = links || [];
     this.debug = debug || false;
