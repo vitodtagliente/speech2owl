@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/vitodtagliente/speech2owl#readme",
   "dependencies": {
+    "colors": "^1.1.2",
     "express": "^4.15.2",
     "pos": "^0.4.2"
   }
