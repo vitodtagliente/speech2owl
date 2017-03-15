@@ -23,5 +23,9 @@
   "bugs": {
     "url": "https://github.com/vitodtagliente/speech2owl/issues"
   },
-  "homepage": "https://github.com/vitodtagliente/speech2owl#readme"
+  "homepage": "https://github.com/vitodtagliente/speech2owl#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "pos": "^0.4.2"
+  }
 }
