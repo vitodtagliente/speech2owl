@@ -1,6 +1,6 @@
 # speech2owl
 
-Creating an owl ontology starting from speech recognition
+This sample application can create owl ontology representations starting from speech recognition
 
 ### Installation
 
@@ -19,6 +19,7 @@ npm start
 ```
 
 Redirect your Broswer to localhost:8000
+Make sure to run the application with Google Chrome (Web Speech API dependence)
 
 ## License
 
