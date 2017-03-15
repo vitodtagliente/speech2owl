@@ -67,6 +67,9 @@ speech2owl.OntologyBuilder.Full = function( nlp, links, debug ){
             var tree = this.nlp.data()[i].relations();
 
             this.readTree( owl, tree.root );
+
+            owl.individual(this.nlp.data()[i].text.replaceAll(' ', '_' ), '#Sentence')
+                .datatype('hasSentenceValue', 'string', this.nlp.data()[i].text );
         }
 
 
@@ -81,12 +84,12 @@ speech2owl.OntologyBuilder.Full = function( nlp, links, debug ){
     this.readTree = function( owl, node ){
 
         if( node.data.isNoun ){
-            elem = owl.class('#'+node.data.token)
+            elem = owl.class('#'+node.data.token.replaceAll(' ', '_'))
                 .subClassOf('#KnowledgeElement')
                 .subClassOf('#Noun');
 
             if( node.parent != null && node.parent.data.isNoun ){
-                elem.subClassOf('#'+node.parent.data.token);
+                elem.subClassOf('#'+node.parent.data.token.replaceAll(' ', '_'));
             }
 
             for( var i = 0; i < this.links.length; i++ ){
@@ -99,25 +102,28 @@ speech2owl.OntologyBuilder.Full = function( nlp, links, debug ){
             }
         }
         else if( node.data.isVerb ){
-            elem = owl.class('#relation_'+node.data.token)
+            elem = owl.class('#relation_'+node.data.token.replaceAll(' ', '_'))
                 .subClassOf('#KnowledgeRelation')
                 .subClassOf('#Verb');
 
             if( parent != null && node.children[0] != null ){
-                var parentClass = owl.class('#'+node.parent.data.token);
+                var parentClass = owl.class('#'+node.parent.data.token.replaceAll(' ', '_'));
                 var child = node.children[0];
 
                 parentClass.restriction(
                     new OWL.Restriction()
-                        .onProperty('#'+node.data.token)
-                        .someValuesFrom('#'+child.data.token)
+                        .onProperty('#'+node.data.token.replaceAll(' ', '_'))
+                        .someValuesFrom('#'+child.data.token.replaceAll(' ', '_'))
                 );
                 elem.restriction(
                     new OWL.Restriction().onProperty('joins').someValuesFrom(parentClass.URI)
                 );
                 elem.restriction(
-                    new OWL.Restriction().onProperty('joins').someValuesFrom('#'+child.data.token)
+                    new OWL.Restriction().onProperty('joins').someValuesFrom('#'+child.data.token.replaceAll(' ', '_'))
                 );
+
+                owl.property('#'+node.data.token.replaceAll(' ', '_'))
+                    .domain(parentClass.URI).range('#'+child.data.token.replaceAll(' ', '_'));
             }
         }
 
