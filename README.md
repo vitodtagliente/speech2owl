@@ -6,17 +6,17 @@ Creating an owl ontology starting from speech recognition
 
 Open the shell and install the dependencies with:
 
-'''bash
+```bash
 npm update
-'''
+```
 
 ### Getting Started
 
 Once all the dependencies have been installed, you can run the server typing:
 
-'''bash
+```'bash
 npm start
-'''
+```
 
 Redirect your Broswer to localhost:8000
 
