@@ -62,8 +62,8 @@
     <div class = 'row justify-content-center pt-3'>
         <div class = 'col-8 col-sm-8'>
             <button id = 'btn_annotate' class = 'btn btn-success'>Annotate</button>
-            <a id = 'btn_download_lite' class = 'btn btn-danger invisible' href='#'>Ontology Lite</a>
-            <a id = 'btn_download_full' class = 'btn btn-danger invisible' href='#'>Ontology Full</a>
+            <a id = 'btn_download_lite' class = 'btn btn-danger invisible' href='#'>Download Ontology</a>
+            <a id = 'btn_download_full' class = 'btn btn-danger invisible' href='#'>Extra</a>
         </div>
     </div>
 
@@ -92,8 +92,8 @@
 <script src='speech2owl/nlp.syntaxtree.js'></script>
 
 <script src='speech2owl/entitylinker.js'></script>
-<script src='speech2owl/ontologybuilder.lite.js'></script>
-<script src='speech2owl/ontologybuilder.full.js'></script>
+<script src='speech2owl/ontologybuilder.js'></script>
+<script src='speech2owl/ontologybuilder.extra.js'></script>
 
 <script src='owl/owl.js'></script>
 <script src='owl/owl.namespace.js'></script>
@@ -242,21 +242,21 @@ function annotate(){
         console.log( nlp.data()[i].text );
         console.log( nlp.data()[i].relations().toString() );
     }
-    /*
+
     // Create owl's representation
-    var builder = new speech2owl.OntologyBuilder.Lite( nlp, links, false );
+    var builder = new speech2owl.OntologyBuilder( nlp, links, true );
     var ontology = builder.build();
 
     // Make the ontology downloadable
     btn_download_lite.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent( ontology ));
-    btn_download_lite.setAttribute('download', 'ontology.lite.owl');
-    */
-    builder = new speech2owl.OntologyBuilder.Full( nlp, links, true );
-    var ontology = builder.build();
+    btn_download_lite.setAttribute('download', 'ontology.owl');
+
+    builder = new speech2owl.OntologyBuilder.Extra( nlp, links, false );
+    ontology = builder.build();
 
     // Make the ontology downloadable
     btn_download_full.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent( ontology ));
-    btn_download_full.setAttribute('download', 'ontology.full.owl');
+    btn_download_full.setAttribute('download', 'ontology.extra.owl');
 
 }
 

@@ -2,7 +2,7 @@
 var speech2owl = speech2owl || {};
 speech2owl.OntologyBuilder = speech2owl.OntologyBuilder || {};
 
-speech2owl.OntologyBuilder.Lite = function( nlp, links, debug ){
+speech2owl.OntologyBuilder = function( nlp, links, debug ){
     this.nlp = nlp;
     this.links = links || [];
     this.debug = debug || false;
@@ -23,8 +23,17 @@ speech2owl.OntologyBuilder.Lite = function( nlp, links, debug ){
         owl.namespace.default().add( SPEECH2OWL.base() );
         owl.header.about( SPEECH2OWL.get('') );
 
-        // ---------- 
+        // ---------- Classes
 
+        owl.class('#DomainConcept');
+
+        for( var i = 0; i < this.links.length; i++ ){
+            var l = this.links[i];
+
+            owl.class('#'+l.token+'Concept')
+                .subClassOf('#DomainConcept')
+                .equivalentClass(l.triple.subject);
+        }
 
         var output = owl.toString();
 

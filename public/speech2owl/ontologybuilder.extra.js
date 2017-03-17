@@ -2,7 +2,7 @@
 var speech2owl = speech2owl || {};
 speech2owl.OntologyBuilder = speech2owl.OntologyBuilder || {};
 
-speech2owl.OntologyBuilder.Full = function( nlp, links, debug ){
+speech2owl.OntologyBuilder.Extra = function( nlp, links, debug ){
     this.nlp = nlp;
     this.links = links || [];
     this.debug = debug || false;
