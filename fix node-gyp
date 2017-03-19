@@ -1,0 +1,5 @@
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n 4.4.5
+sudo npm install npm -g
+sudo npm uninstall node-gyp -g
