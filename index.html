@@ -140,7 +140,6 @@ var btn_annotate = document.getElementById( 'btn_annotate' );
 // Init the ontology
 var rdf = new speech2owl.RDF( 'assets/pizza.owl.xml', false ); // default ontology
 var RDFS = new speech2owl.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
-var PIZZA = new speech2owl.RDF.Namespace( 'http://www.co-ode.org/ontologies/pizza/pizza.owl#' );
 var OWLN = new speech2owl.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
 rdf.onload = function(){
     console.log( "RDF::Parsed" );
@@ -259,15 +258,19 @@ function annotate(){
             for( var z = 0; z < result.length; z++ ){
                 var r = result[z];
 
+                var base = '';
+                if( r.object.includes('#') )
+                    base = r.object.split('#')[0] + '#';
+
                 if( r.predicate == OWLN.get('onProperty') )
-                    this_content += ' ' + r.object.replace( PIZZA.get(''), '' );
+                    this_content += ' ' + r.object.replace( base, '' );
                 else if( r.predicate == OWLN.get('someValuesFrom') )
-                    this_content += ' <span style=\'color: purple\'>some</span> ' + r.object.replace( PIZZA.get(''), '' );
+                    this_content += ' <span style=\'color: purple\'>some</span> ' + r.object.replace( base, '' );
                 else if( r.predicate == OWLN.get('allValuesFrom') ){
                     this_content = null;
                 }
                 else if( r.predicate == OWLN.get('hasValue') ){
-                    this_content += ' <span style=\'color: purple\'>value</span> ' + r.object.replace( PIZZA.get(''), '' );
+                    this_content += ' <span style=\'color: purple\'>value</span> ' + r.object.replace( base, '' );
                 }
             }
             if( this_content != null && this_content != '' )
