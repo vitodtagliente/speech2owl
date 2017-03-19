@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE rdf:RDF [
+	<!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+	<!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+	<!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+	<!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+	<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+	<!ENTITY speech2owl "http://www.speech2owl.org/ontologies/speech2owl/speech2owl#" >
+]>
+
+<rdf:RDF 
+	xmlns:owl = "http://www.w3.org/2002/07/owl#"
+	xmlns:xsd = "http://www.w3.org/2001/XMLSchema#"
+	xmlns:xml = "http://www.w3.org/XML/1998/namespace"
+	xmlns:rdfs = "http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:speech2owl = "http://www.speech2owl.org/ontologies/speech2owl/speech2owl#"
+	xmlns = "http://www.speech2owl.org/ontologies/speech2owl/speech2owl#"
+	xml:base = "http://www.speech2owl.org/ontologies/speech2owl/speech2owl" >
+
+<owl:Ontology rdf:about="http://www.speech2owl.org/ontologies/speech2owl/speech2owl#">
+</owl:Ontology>
+
+
+<owl:Class rdf:about="#DomainConcept">
+</owl:Class>
+
+
+<owl:Class rdf:about="#pizzaConcept">
+	<rdfs:subClassOf rdf:resource="#DomainConcept"/>
+	<owl:equivalentClass rdf:resource="http://www.co-ode.org/ontologies/pizza/pizza.owl#Pizza"/>
+</owl:Class>
+
+
+<owl:Class rdf:about="#MargheritaConcept">
+	<rdfs:subClassOf rdf:resource="#DomainConcept"/>
+	<owl:equivalentClass rdf:resource="http://www.co-ode.org/ontologies/pizza/pizza.owl#Margherita"/>
+</owl:Class>
+
+
+<owl:Class rdf:about="#CapricciosaConcept">
+	<rdfs:subClassOf rdf:resource="#DomainConcept"/>
+	<owl:equivalentClass rdf:resource="http://www.co-ode.org/ontologies/pizza/pizza.owl#Capricciosa"/>
+</owl:Class>
+
+
+</rdf:RDF>

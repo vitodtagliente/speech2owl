@@ -22,7 +22,27 @@
 
 <div class = 'container'>
 
-    <div class = 'row justify-content-center pt-5'>
+    <div class = 'row justify-content-center pt-4'>
+        <div class = 'col-8 col-sm-8'>
+            <div class = "alert alert-info">
+                <a href='#section_uploading' id = 'label_ontology' data-toggle="collapse" aria-expanded="false" aria-controls="section_uploading">Using: <b>pizza.owl</b></a>
+            </div>
+        </div>
+    </div>
+
+    <div class = 'row justify-content-center'>
+        <div class = 'col-8 col-sm-8'>
+            <form id = 'upload_form' method = 'POST' action = 'upload' class = 'form-inline'>
+                <div class = 'content collapse' id = 'section_uploading'>
+                    <div class = 'form-group'>
+                        <input name = 'file' type = "file" id = 'file_upload' />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class = 'row justify-content-center pt-2'>
         <div class = 'col-8 col-sm-8'>
             <form>
                 <div class="form-group">
@@ -113,24 +133,57 @@ var textarea = document.getElementById('speechTextarea');
 var speech = new speech2owl.Speech( 'speechTextarea', 'speechButton', true );
 speech.bindCheckbox( 'speechContinuous' );
 
-// Init the ontology
-var rdf = new speech2owl.RDF( 'assets/pizza.owl.xml', false );
-var RDFS = new speech2owl.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
-var RDF = new speech2owl.RDF.Namespace( "http://www.w3.org/1999/02/22-rdf-syntax-ns#" );
-var OWLN = new speech2owl.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
-var PIZZA = new speech2owl.RDF.Namespace( 'http://www.co-ode.org/ontologies/pizza/pizza.owl#' );
-rdf.onload = function(){
+var btn_download_lite = document.getElementById('btn_download_lite');
+var btn_download_full = document.getElementById('btn_download_full');
+var btn_annotate = document.getElementById( 'btn_annotate' );
 
+// Init the ontology
+var rdf = new speech2owl.RDF( 'assets/pizza.owl.xml', false ); // default ontology
+var RDFS = new speech2owl.RDF.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' );
+var PIZZA = new speech2owl.RDF.Namespace( 'http://www.co-ode.org/ontologies/pizza/pizza.owl#' );
+var OWLN = new speech2owl.RDF.Namespace( 'http://www.w3.org/2002/07/owl#' );
+rdf.onload = function(){
+    console.log( "RDF::Parsed" );
 }
 
 var nlp = null;
 
-var btn_annotate = document.getElementById( 'btn_annotate' );
 if( btn_annotate != null )
     btn_annotate.onclick = nlpRequest;
 
-var btn_download_lite = document.getElementById('btn_download_lite');
-var btn_download_full = document.getElementById('btn_download_full');
+document.getElementById('file_upload').onchange = function(e){
+    //Retrieve the first (and only!) File from the FileList object
+    var file = e.target.files[0];
+
+    if (file && file.type == "application/rdf+xml") {
+
+        var data = new FormData();
+        data.append( 'file', file, file.name );
+
+        $.ajax( {
+            url: 'upload',
+            type: 'POST',
+            data: data,
+            processData: false,
+            contentType: false,
+            'success': function(e){
+                console.log( e );
+                if( e == "UPLOAD::SUCCESS" )
+                {
+                    var filename = document.getElementById('file_upload').files[0].name;
+                    rdf = new speech2owl.RDF( 'assets/'+filename, false );
+                    var elem = document.getElementById('label_ontology');
+                    elem.innerHTML = "Using: <b>"+filename+"</b>";
+
+                    $('.collapse').collapse('hide');
+                }
+            }
+        } );
+
+    }
+    else alert("You can upload only application/rdf+xml files");
+
+}
 
 function nlpRequest(){
 
@@ -244,7 +297,7 @@ function annotate(){
     }
 
     // Create owl's representation
-    var builder = new speech2owl.OntologyBuilder( nlp, links, true );
+    var builder = new speech2owl.OntologyBuilder( nlp, links, false );
     var ontology = builder.build();
 
     // Make the ontology downloadable
